@@ -32,16 +32,16 @@ Too big or too foggy for one session: `wayfinder`* first; when its map clears, e
 - Raw incoming requests in beads → `triage`*.
 - Reporting a perf number → `benchmark-checklist`*.
 - No scripted way to drive the app → `create-verification-skill`*; audit it later → `maintain-verification-skill`*.
-- User corrected you → the Lessons section of `verify-before-claiming`. Periodic repo-wide sweep → `correct`*.
-- Prose for people (docs, PR bodies, commits) → `writing-for-people`. Docs agents read (skills, AGENTS.md) → `writing-for-agents`.
+- User corrected you → the Lessons section of `verify-before-claiming`. Periodic repo-wide sweep → `correct`*. Retrospective on a session's environment → `retro`*.
+- Prose for people (docs, PR bodies, commits) → `writing-for-people`. Docs agents read (skills, AGENTS.md) → `writing-for-agents`. An article from scratch: `writing-fragments`* (explore), then `writing-shape`* or `writing-beats`* (exploit).
 - Isolated branch → `using-git-worktrees`. Integrating finished work → `finishing-a-development-branch`. PR body → `pr`.
 - Comment cleanup before review → `no-comments`*.
 - Context hand-off to a new session, harness, or person → `handoff`*.
 - Learning a concept over several sessions → `teach`*.
 
-Setup and one-off skills (`setup-pre-commit`, `git-guardrails-claude-code`, `migrate-to-shoehorn`, `scaffold-exercises`) fire on their own descriptions.
+Setup and one-off skills (`setup-pre-commit`, `git-guardrails-claude-code`, `migrate-to-shoehorn`, `scaffold-exercises`, `wizard`) fire on their own descriptions. `wait-what`* is the user's re-pitch request. Upstream back-import for this skill set → `skills-sync`*.
 
 ## Operating model
 
-- A coordinator Claude Code session plans and dispatches build sessions as pi agents in named tmux windows: `~/dev/utils/skills-house/bin/pi-window <name> <workdir> <brief-file>`. Each build session reports where its brief says.
+- A coordinator Claude Code session plans and dispatches build sessions as pi agents in named tmux windows → `dispatch` (coordinator only). Each build session reports where its brief says.
 - Claude subagents (Agent tool; pi `subagent`) only when the user asks for them.

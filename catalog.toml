@@ -18,6 +18,8 @@ pin = "bb92a77741419a4ab5f06e711a283343f1ada0c3"
 repo = "https://github.com/cursor/plugins"
 path = "~/dev/utils/skill-sources/cursor-plugins"
 pin = "850d7f2e9f5e55dff7eb00a0a479337fe79eb22f"
+# Only this subtree is the pstack plugin; the rest of the repo is other Cursor plugins.
+scope = "pstack"
 
 [[skill]]
 name = "tight-spec"
@@ -341,3 +343,87 @@ reason = "Replaced by the house router flow; routes to mattpocock-only skills an
 [[drop]]
 from = "superpowers:skills/using-superpowers"
 reason = "Replaced by the house router flow; its per-harness tool references and always-invoke bootstrap are superpowers plumbing."
+
+# --- sk-81s.14: uncovered upstream skills ---
+
+[[skill]]
+name = "retro"
+job = "session-retro"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/retro"]
+
+[[skill]]
+name = "wizard"
+job = "human-procedure-script"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/wizard"]
+
+[[skill]]
+name = "wait-what"
+job = "re-pitch"
+mode = "adopt"
+from = ["mattpocock:skills/productivity/wait-what"]
+
+[[skill]]
+name = "writing-fragments"
+job = "writing-explore"
+mode = "adopt"
+from = ["mattpocock:skills/in-progress/writing-fragments"]
+
+[[skill]]
+name = "writing-shape"
+job = "writing-exploit-shape"
+mode = "adopt"
+from = ["mattpocock:skills/in-progress/writing-shape"]
+
+[[skill]]
+name = "writing-beats"
+job = "writing-exploit-beats"
+mode = "adopt"
+from = ["mattpocock:skills/in-progress/writing-beats"]
+
+[[drop]]
+from = "mattpocock:skills/productivity/to-questionnaire"
+reason = "Rarely needed."
+
+[[drop]]
+from = "mattpocock:skills/engineering/setup-matt-pocock-skills"
+reason = "Replaced by beads plus the AGENTS.md tracker note (sk-81s.13)."
+
+[[drop]]
+from = "mattpocock:skills/in-progress/chief-of-staff"
+reason = "Covered by handoff and the coordinator model (dispatch)."
+
+[[drop]]
+from = "mattpocock:skills/in-progress/claude-handoff"
+reason = "Covered by handoff and the coordinator model (dispatch)."
+
+[[drop]]
+from = "mattpocock:skills/in-progress/loop-me"
+reason = "Covered by handoff and the coordinator model (dispatch)."
+
+[[drop]]
+from = "mattpocock:skills/in-progress/setup-ts-deep-modules"
+reason = "TypeScript-only."
+
+[[drop]]
+from = "superpowers:skills/diagnosing-superpowers"
+reason = "Debugs superpowers sessions; superpowers is being uninstalled."
+
+[[drop]]
+from = "pstack:pstack/automations/benny"
+reason = "Dormant Cursor automations for Slack issue reports (setup-benny, triage-issue-reports, reproduce-and-fix-issues); Cursor/Slack-only. Provisional: not in the user's sk-81s.14 list."
+
+# --- sk-81s.6: sync ---
+
+[[skill]]
+name = "skills-sync"
+job = "upstream-sync"
+mode = "own"
+
+# --- sk-81s.9: coordinator dispatch ---
+
+[[skill]]
+name = "dispatch"
+job = "coordinator-dispatch"
+mode = "own"

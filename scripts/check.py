@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Gate for the house skill set: manifest coverage, names, collisions, source refs, always-on budget."""
-import glob, os, re, sys, tomllib
+import fnmatch, glob, os, re, sys, tomllib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
@@ -39,6 +39,40 @@ def resolve_ref(ref, sources):
     return None
 
 
+def upstream_skill_dirs(source, files=None):
+    """Repo-relative dirs holding a SKILL.md under the source's `scope` prefix.
+
+    files: repo-relative file paths (e.g. `git ls-tree` of a commit); default walks the checkout.
+    """
+    scope = source.get("scope", "").strip("/")
+    if files is None:
+        root = os.path.expanduser(source.get("path", ""))
+        files = []
+        for dirpath, dirnames, filenames in os.walk(os.path.join(root, scope) if scope else root):
+            dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+            if "SKILL.md" in filenames:
+                files.append(os.path.relpath(os.path.join(dirpath, "SKILL.md"), root))
+    return sorted(
+        os.path.dirname(f) for f in files
+        if os.path.basename(f) == "SKILL.md" and (not scope or f.startswith(scope + "/"))
+    )
+
+
+def ref_covers(pattern, path):
+    """True if a ref path pattern (globs allowed) matches `path` or one of its ancestor dirs."""
+    parts = path.split("/")
+    pattern = pattern.rstrip("/")
+    return any(fnmatch.fnmatchcase("/".join(parts[:i]), pattern) for i in range(1, len(parts) + 1))
+
+
+def unmapped(catalog, source_name, dirs):
+    """Dirs not covered by any [[skill]]/[[drop]] ref of this source."""
+    refs = [r for e in catalog.get("skill", []) for r in e.get("from", [])]
+    refs += [d.get("from", "") for d in catalog.get("drop", [])]
+    pats = [r.partition(":")[2] for r in refs if r.partition(":")[0] == source_name]
+    return [d for d in dirs if not any(ref_covers(p, d) for p in pats)]
+
+
 def main():
     errors = []
     catalog = tomllib.load(open(os.path.join(ROOT, "catalog.toml"), "rb"))
@@ -66,6 +100,10 @@ def main():
         err = resolve_ref(d.get("from", ""), sources)
         if err:
             errors.append(f"catalog: drop from: {err}")
+    for sname, src in sources.items():
+        if os.path.isdir(os.path.expanduser(src.get("path", ""))):
+            for d in unmapped(catalog, sname, upstream_skill_dirs(src)):
+                errors.append(f"upstream: {sname}:{d} has no [[skill]] or [[drop]] entry")
 
     skills_dir = os.path.join(ROOT, "skills")
     dirs = sorted(d for d in os.listdir(skills_dir) if os.path.isdir(os.path.join(skills_dir, d)))

@@ -5,10 +5,10 @@ One rationalized agent skill set for Claude Code and pi, built from pinned upstr
 ## Layout
 
 - `skills/<name>/SKILL.md` — flat, one dir per house skill. `name:` in front matter must equal the dir name (lowercase, hyphens).
-- `catalog.toml` — the manifest. Every house skill has exactly one `[[skill]]` entry: `job`, `mode` (`own` | `adopt` | `adapt` | `merge`), and `from` (source refs `source:path`). Upstream skills deliberately not taken are `[[drop]]` entries with a `reason`. `[sources.*]` pin each upstream to a full commit.
-- `scripts/check.py` — the gate: manifest ↔ dirs coverage, every `from`/drop ref resolves under its source path (globs allowed), no name collisions, name rules, always-on description token budget. Run before any commit.
+- `catalog.toml` — the manifest. Every house skill has exactly one `[[skill]]` entry: `job`, `mode` (`own` | `adopt` | `adapt` | `merge`), and `from` (source refs `source:path`). Upstream skills deliberately not taken are `[[drop]]` entries with a `reason`. `[sources.*]` pin each upstream to a full commit; optional `scope` limits it to a subtree.
+- `scripts/check.py` — the gate: manifest ↔ dirs coverage, every `from`/drop ref resolves under its source path (globs allowed), every upstream SKILL.md dir in scope is covered by a `[[skill]]` or `[[drop]]` ref, no name collisions, name rules, always-on description token budget. Run before any commit.
 - `scripts/link.py` — links exactly the house skills into the harness dirs and prunes links that point into this repo but no longer exist. `--dry-run` first.
-- `scripts/sync.py` — back-imports upstream changes since each pin as a report plus beads for triage.
+- `scripts/sync.py` — fetches sources and writes `reports/YYYY-MM-DD.md`: pin bumps for adopted skills, diff digests for adapted/merged ones, unmapped upstream skills. `--file-beads` files one bead per candidate; `--bump <source> <commit>` rewrites a pin. Driven by the `skills-sync` skill.
 
 ## Rules
 
