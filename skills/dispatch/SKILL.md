@@ -9,7 +9,7 @@ description: Coordinator only: launch, watch, steer, and close out pi build sess
 
 You are the coordinator: you plan, brief, verify, and commit. Build work runs in a pi session in its own tmux window, not in your context. Use Claude subagents (Agent tool, pi `subagent`) only when the user asks for them.
 
-Scripts live in `~/dev/utils/skills-house/skills/dispatch/scripts/` (`$D` below). Both need to run inside tmux and target windows of the current session.
+Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both need to run inside tmux and target windows of the current session.
 
 ## Dispatch one session
 

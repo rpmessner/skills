@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 # Skills sync
 
-Run from `~/dev/utils/skills-house`. Upstream sources are read-only: never edit them; `git fetch` is the only write.
+Run from `~/dev/utils/skills`. Upstream sources are read-only: never edit them; `git fetch` is the only write.
 
 1. **Report.** Run `scripts/sync.py`. It fetches each source and writes `reports/YYYY-MM-DD.md`, then prints the candidates. Zero candidates: tell the user, stop.
    Done when the report exists and you have its candidate list.
