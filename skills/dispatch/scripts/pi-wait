@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Wait for a pi build session in tmux window <window> to print <marker>.
+# usage: pi-wait <window> <marker> [timeout-seconds]   (default timeout 3600)
+# Polls the last 200 lines of the pane. A line matches only if, with leading and
+# trailing whitespace trimmed, it equals the marker exactly: the marker quoted inside
+# the brief or the launch command never matches.
+# exit 0 DONE (marker line), 3 EXITED ("[pi exited] press enter" line), 4 timeout,
+#      2 window gone, 1 usage.
+set -uo pipefail
+[ $# -ge 2 ] && [ $# -le 3 ] || { echo "usage: pi-wait <window> <marker> [timeout-seconds]" >&2; exit 1; }
+win=$1 marker=$2 timeout=${3:-3600} interval=${PI_WAIT_INTERVAL:-5}
+[[ $timeout =~ ^[0-9]+$ ]] || { echo "timeout must be whole seconds: $timeout" >&2; exit 1; }
+[ -n "$(printf '%s' "$marker" | tr -d '[:space:]')" ] || { echo "marker must not be blank" >&2; exit 1; }
+
+# Prints the first whole-line hit: DONE beats EXITED (a session that finished and then quit is done).
+scan() {
+  M="$marker" awk '
+    { gsub(/^[[:space:]]+|[[:space:]]+$/, "") }
+    $0 == ENVIRON["M"] { done = 1 }
+    $0 == "[pi exited] press enter" { exited = 1 }
+    END { if (done) print "DONE"; else if (exited) print "EXITED" }'
+}
+
+deadline=$((SECONDS + timeout))
+while :; do
+  tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win" || { echo "GONE"; exit 2; }
+  hit=$(tmux capture-pane -p -J -S -200 -t ":$win" 2>/dev/null | scan)
+  case $hit in
+    DONE) echo DONE; exit 0 ;;
+    EXITED) echo EXITED; exit 3 ;;
+  esac
+  [ "$SECONDS" -ge "$deadline" ] && { echo "TIMEOUT"; exit 4; }
+  sleep "$interval"
+done
