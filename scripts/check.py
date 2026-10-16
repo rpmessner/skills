@@ -26,6 +26,21 @@ def front_matter(path):
     return fm
 
 
+def plain_scalar_hazards(path):
+    """Unquoted front-matter values that strict YAML parsers (pi) reject: ': ' or ' #' inside, or a leading indicator."""
+    text = open(path, encoding="utf-8").read()
+    end = text.find("\n---", 4)
+    bad = []
+    for line in text[4:end].splitlines():
+        m = re.match(r"^([A-Za-z0-9_-]+):\s+(.+)$", line)
+        if not m or m.group(2)[0] in "\"'|>":
+            continue
+        value = m.group(2)
+        if ": " in value or " #" in value or value[0] in "[]{}&*!%@`,?-":
+            bad.append(m.group(1))
+    return bad
+
+
 def resolve_ref(ref, sources):
     """Return an error string if `source:path` (globs allowed) matches nothing under the source's path."""
     name, _, rel = ref.partition(":")
@@ -128,6 +143,8 @@ def main():
             errors.append(f"skills/{d}: name must be lowercase words joined by hyphens")
         if not fm.get("description"):
             errors.append(f"skills/{d}/SKILL.md: missing description")
+        for key in plain_scalar_hazards(path):
+            errors.append(f"skills/{d}/SKILL.md: quote the '{key}' value; strict YAML (pi) rejects it unquoted")
         if fm.get("disable-model-invocation", "").lower() != "true":
             always_on += (len(d) + len(fm.get("description", ""))) // 4
 

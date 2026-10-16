@@ -1,6 +1,6 @@
 ---
 name: dispatch
-description: Coordinator only: launch, watch, steer, and close out pi build sessions in named tmux windows, singly or from `bd ready` across repos.
+description: "Coordinator only: launch, watch, steer, and close out pi build sessions in named tmux windows, singly or from `bd ready` across repos."
 ---
 
 <!-- house: own -->

@@ -412,7 +412,7 @@ reason = "Debugs superpowers sessions; superpowers is being uninstalled."
 
 [[drop]]
 from = "pstack:pstack/automations/benny"
-reason = "Dormant Cursor automations for Slack issue reports (setup-benny, triage-issue-reports, reproduce-and-fix-issues); Cursor/Slack-only. Provisional: not in the user's sk-81s.14 list."
+reason = "Dormant Cursor automations for Slack issue reports (setup-benny, triage-issue-reports, reproduce-and-fix-issues); Cursor/Slack-only. Confirmed by the user 2026-10-16."
 
 # --- sk-81s.6: sync ---
 
