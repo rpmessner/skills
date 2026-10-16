@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Launch a pi build session in a new tmux window of the current tmux session.
+# usage: pi-window <window-name> <workdir> <brief-file>
+# The brief file's contents become pi's first message. pi runs under an interactive
+# zsh so ~/.zshrc.local's pi() wrapper (TypeSafe key, Jev flags) applies.
+set -euo pipefail
+[ $# -eq 3 ] || { echo "usage: pi-window <window-name> <workdir> <brief-file>" >&2; exit 2; }
+name=$1 dir=$2 brief=$3
+[[ $name =~ ^[a-z0-9][a-z0-9-]{0,30}$ ]] || { echo "window name must be short kebab-case: $name" >&2; exit 2; }
+[ -d "$dir" ] || { echo "no such workdir: $dir" >&2; exit 2; }
+[ -s "$brief" ] || { echo "brief file missing or empty: $brief" >&2; exit 2; }
+[ -n "${TMUX:-}" ] || { echo "not inside tmux" >&2; exit 2; }
+if tmux list-windows -F '#W' | grep -qx "$name"; then echo "window already exists: $name" >&2; exit 1; fi
+brief=$(realpath "$brief")
+tmux new-window -d -n "$name" -c "$dir" \
+  "zsh -ic 'pi --name \"$name\" \"\$(<\"$brief\")\"; echo; echo \"[pi exited] press enter\"; read'"
+tmux set-option -w -t ":$name" automatic-rename off >/dev/null
+echo "launched pi in window '$name' ($dir)"
