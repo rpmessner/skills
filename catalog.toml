@@ -1,0 +1,343 @@
+# House skill manifest. scripts/check.py enforces it; scripts/sync.py reads the pins.
+
+[budget]
+# Approximate always-on tokens (name + description, chars/4) across model-invocable skills.
+always_on_tokens = 2500
+
+[sources.mattpocock]
+repo = "https://github.com/mattpocock/skills"
+path = "~/dev/utils/skill-sources/mattpocock-upstream"
+pin = "49dd158d1076134a641b33efb035946536778336"
+
+[sources.superpowers]
+repo = "https://github.com/obra/superpowers"
+path = "~/dev/utils/skill-sources/superpowers"
+pin = "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+
+[sources.pstack]
+repo = "https://github.com/cursor/plugins"
+path = "~/dev/utils/skill-sources/cursor-plugins"
+pin = "850d7f2e9f5e55dff7eb00a0a479337fe79eb22f"
+
+[[skill]]
+name = "tight-spec"
+job = "spec"
+mode = "merge"
+from = ["mattpocock:skills/engineering/to-spec", "mattpocock:skills/engineering/grill-with-docs", "mattpocock:skills/productivity/grill-me", "superpowers:skills/brainstorming", "pstack:pstack/skills/interrogate", "pstack:pstack/skills/how"]
+
+[[skill]]
+name = "verify-before-claiming"
+job = "verify"
+mode = "merge"
+from = ["superpowers:skills/verification-before-completion", "pstack:pstack/skills/principle-prove-it-works", "pstack:pstack/skills/show-me-your-work"]
+
+[[skill]]
+name = "principles"
+job = "principles"
+mode = "merge"
+from = [
+  "pstack:pstack/skills/principle-attack-the-premise",
+  "pstack:pstack/skills/principle-boundary-discipline",
+  "pstack:pstack/skills/principle-build-the-lever",
+  "pstack:pstack/skills/principle-encode-lessons-in-structure",
+  "pstack:pstack/skills/principle-experience-first",
+  "pstack:pstack/skills/principle-explain-the-number",
+  "pstack:pstack/skills/principle-foundational-thinking",
+  "pstack:pstack/skills/principle-laziness-protocol",
+  "pstack:pstack/skills/principle-make-operations-idempotent",
+  "pstack:pstack/skills/principle-migrate-callers-then-delete-legacy-apis",
+  "pstack:pstack/skills/principle-minimize-reader-load",
+  "pstack:pstack/skills/principle-model-the-domain",
+  "pstack:pstack/skills/principle-outcome-oriented-execution",
+  "pstack:pstack/skills/principle-redesign-from-first-principles",
+  "pstack:pstack/skills/principle-separate-before-serializing-shared-state",
+  "pstack:pstack/skills/principle-sequence-verifiable-units",
+  "pstack:pstack/skills/principle-type-system-discipline",
+  "pstack:pstack/skills/principle-subtract-before-you-add",
+]
+
+[[skill]]
+name = "diagnosing-bugs"
+job = "debug"
+mode = "merge"
+from = ["mattpocock:skills/engineering/diagnosing-bugs", "superpowers:skills/systematic-debugging", "pstack:pstack/skills/principle-fix-root-causes"]
+
+[[skill]]
+name = "code-review"
+job = "review"
+mode = "merge"
+from = ["mattpocock:skills/engineering/code-review", "superpowers:skills/requesting-code-review", "superpowers:skills/receiving-code-review", "pstack:pstack/skills/blast-radius", "pstack:pstack/agents/comment-sicko.md"]
+
+[[skill]]
+name = "to-tickets"
+job = "tickets"
+mode = "adapt"
+from = ["mattpocock:skills/engineering/to-tickets", "superpowers:skills/writing-plans"]
+
+[[skill]]
+name = "wayfinder"
+job = "large-effort-planning"
+mode = "adapt"
+from = ["mattpocock:skills/engineering/wayfinder"]
+
+[[skill]]
+name = "implement"
+job = "implement"
+mode = "merge"
+from = ["mattpocock:skills/engineering/implement", "mattpocock:skills/engineering/implement-spec", "superpowers:skills/executing-plans", "superpowers:skills/subagent-driven-development", "superpowers:skills/dispatching-parallel-agents", "pstack:pstack/skills/swarm"]
+
+[[skill]]
+name = "tdd"
+job = "tdd"
+mode = "merge"
+from = ["mattpocock:skills/engineering/tdd", "superpowers:skills/test-driven-development", "pstack:pstack/skills/tdd", "pstack:pstack/skills/principle-test-behavior-not-implementation"]
+
+# --- sk-81s.5: adopt as-is ---
+
+[[skill]]
+name = "codebase-design"
+job = "module-design"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/codebase-design"]
+
+[[skill]]
+name = "improve-codebase-architecture"
+job = "architecture-review"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/improve-codebase-architecture"]
+
+[[skill]]
+name = "domain-modeling"
+job = "domain-model"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/domain-modeling"]
+
+[[skill]]
+name = "prototype"
+job = "prototype"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/prototype"]
+
+[[skill]]
+name = "research"
+job = "research"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/research"]
+
+[[skill]]
+name = "pr"
+job = "pr-body"
+mode = "adopt"
+from = ["mattpocock:skills/engineering/pr"]
+
+[[skill]]
+name = "triage"
+job = "triage"
+mode = "adapt"
+from = ["mattpocock:skills/engineering/triage"]
+
+[[skill]]
+name = "grilling"
+job = "grill"
+mode = "adopt"
+from = ["mattpocock:skills/productivity/grilling"]
+
+[[skill]]
+name = "handoff"
+job = "handoff"
+mode = "adopt"
+from = ["mattpocock:skills/productivity/handoff"]
+
+[[skill]]
+name = "teach"
+job = "teach"
+mode = "adopt"
+from = ["mattpocock:skills/productivity/teach"]
+
+[[skill]]
+name = "using-git-worktrees"
+job = "worktree-isolation"
+mode = "adopt"
+from = ["superpowers:skills/using-git-worktrees"]
+
+[[skill]]
+name = "finishing-a-development-branch"
+job = "branch-finish"
+mode = "adapt"
+from = ["superpowers:skills/finishing-a-development-branch"]
+
+# The user's local misc/ copies are byte-identical to mattpocock upstream misc/ at the pin,
+# so they are adopted from the pinned source rather than tracked as own.
+
+[[skill]]
+name = "git-guardrails-claude-code"
+job = "git-guardrails"
+mode = "adopt"
+from = ["mattpocock:skills/misc/git-guardrails-claude-code"]
+
+[[skill]]
+name = "setup-pre-commit"
+job = "pre-commit-setup"
+mode = "adopt"
+from = ["mattpocock:skills/misc/setup-pre-commit"]
+
+[[skill]]
+name = "scaffold-exercises"
+job = "exercise-scaffold"
+mode = "adopt"
+from = ["mattpocock:skills/misc/scaffold-exercises"]
+
+[[skill]]
+name = "migrate-to-shoehorn"
+job = "shoehorn-migration"
+mode = "adopt"
+from = ["mattpocock:skills/misc/migrate-to-shoehorn"]
+
+# --- sk-81s.5: writing merges ---
+
+[[skill]]
+name = "writing-for-people"
+job = "human-prose"
+mode = "merge"
+from = ["pstack:pstack/skills/technical-writing", "pstack:pstack/skills/unslop"]
+
+[[skill]]
+name = "writing-for-agents"
+job = "agent-docs"
+mode = "merge"
+from = ["mattpocock:skills/productivity/writing-for-agents", "superpowers:skills/writing-skills"]
+
+# --- sk-81s.11: verification skills, no-comments ---
+
+[[skill]]
+name = "create-verification-skill"
+job = "verification-skill-create"
+mode = "adapt"
+from = ["pstack:pstack/skills/create-verification-skill"]
+
+[[skill]]
+name = "maintain-verification-skill"
+job = "verification-skill-maintain"
+mode = "adapt"
+from = ["pstack:pstack/skills/maintain-verification-skill"]
+
+[[skill]]
+name = "no-comments"
+job = "comment-cleanup"
+mode = "adapt"
+from = ["pstack:pstack/skills/no-comments", "pstack:pstack/agents/comment-sicko.md"]
+
+# --- sk-81s.5: drops ---
+
+[[drop]]
+from = "pstack:pstack/skills/setup-pstack"
+reason = "Cursor-only: configures pstack model roles via a Cursor always-applied rule."
+
+[[drop]]
+from = "pstack:pstack/skills/typescript-best-practices"
+reason = "Language style guide, not a workflow; per-repo standards belong in the repo's AGENTS.md and lint config."
+
+[[drop]]
+from = "pstack:pstack/skills/make-bot-ui"
+reason = "Specific to waking a Grok Bot over a webhook; no use outside poteto's setup."
+
+[[drop]]
+from = "pstack:pstack/skills/poteto-mode"
+reason = "poteto's personal working-style bundle; routing is replaced by the house router flow, the rest is covered by principles, verify-before-claiming, writing-for-people, implement."
+
+[[drop]]
+from = "pstack:pstack/skills/poteto-help"
+reason = "Onboarding help for pstack itself; the house set has its own AGENTS.md and catalog."
+
+[[drop]]
+from = "pstack:pstack/skills/bro"
+reason = "Plain-language restatement; covered by writing-for-people and default behaviour."
+
+[[drop]]
+from = "pstack:pstack/skills/ketchup"
+reason = "Chat catch-up summary; covered by handoff and default behaviour."
+
+[[drop]]
+from = "pstack:pstack/skills/in-your-own-words"
+reason = "Goal restatement is step 2 (Restate and size) of tight-spec."
+
+[[drop]]
+from = "pstack:pstack/skills/teach"
+reason = "Same job as the adopted mattpocock teach; depends on pstack how/why."
+
+[[drop]]
+from = "pstack:pstack/skills/automate-me"
+reason = "Cursor-only: writes .cursor/ skills via Cursor's create-skill and reads Cursor transcripts."
+
+[[drop]]
+from = "pstack:pstack/skills/recall"
+reason = "Reads Cursor agent-transcripts; context hand-back is covered by handoff and beads."
+
+[[drop]]
+from = "pstack:pstack/skills/reflect"
+reason = "Reads Cursor agent-transcripts and .cursor paths; routing learnings into edits is the Lessons section of verify-before-claiming."
+
+# --- sk-81s.12: pstack leftovers ---
+
+[[skill]]
+name = "correct"
+job = "mistake-sweep"
+mode = "adopt"
+from = ["pstack:pstack/skills/correct"]
+
+[[skill]]
+name = "benchmark-checklist"
+job = "perf-measurement"
+mode = "adapt"
+from = ["pstack:pstack/skills/benchmark-checklist"]
+
+[[drop]]
+from = "pstack:pstack/skills/architect"
+reason = "Covered by codebase-design and tight-spec; depends on pstack how, why, and arena."
+
+[[drop]]
+from = "pstack:pstack/skills/why"
+reason = "Covered by diagnosing-bugs (history and regression hunting); depends on pstack how and Cursor MCP discovery."
+
+[[drop]]
+from = "pstack:pstack/skills/sharpen"
+reason = "Goal-loosening and outside-check ideas taken into tight-spec; its 'don't narrate, just do' stance conflicts with the spec-and-approve gate (drafts/spec-tickets.md)."
+
+[[drop]]
+from = "pstack:pstack/skills/figure-it-out"
+reason = "Falsifiable done and baseline taken into tight-spec, riskiest-first into to-tickets; the rest is pstack playbook machinery (drafts/spec-tickets.md)."
+
+[[drop]]
+from = "pstack:pstack/skills/arena"
+reason = "Racing N candidate implementations is design exploration, not ticket execution; depends on pstack principle skills and Cursor model config (drafts/implement-tdd.md)."
+
+# --- sk-81s.10: principle cuts ---
+# prove-it-works -> verify-before-claiming, fix-root-causes -> diagnosing-bugs, test-behavior-not-implementation -> tdd
+# (see their from lists); subtract-before-you-add folded into principles/laziness-protocol.
+
+[[drop]]
+from = "pstack:pstack/skills/principle-never-block-on-the-human"
+reason = "Contradicts the working agreement: ask on ambiguous scope, rundown then pushback before executing."
+
+[[drop]]
+from = "pstack:pstack/skills/principle-exhaust-the-design-space"
+reason = "Covered by prototype and codebase-design DESIGN-IT-TWICE; the pinned body is one sentence."
+
+[[drop]]
+from = "pstack:pstack/skills/principle-guard-the-context-window"
+reason = "Pinned body is one bullet; context isolation is covered by implement's subagent guidance and harness defaults."
+
+# --- sk-81s.3: router ---
+
+[[skill]]
+name = "flow"
+job = "router"
+mode = "own"
+
+[[drop]]
+from = "mattpocock:skills/engineering/ask-matt"
+reason = "Replaced by the house router flow; routes to mattpocock-only skills and /setup-matt-pocock-skills."
+
+[[drop]]
+from = "superpowers:skills/using-superpowers"
+reason = "Replaced by the house router flow; its per-harness tool references and always-invoke bootstrap are superpowers plumbing."
