@@ -4,7 +4,7 @@ description: "Interview the user into a bounded, measurable spec before building
 disable-model-invocation: true
 ---
 
-<!-- house: merge; from: own:skills/tight-spec@pre-merge, mattpocock:skills/engineering/to-spec@49dd158, mattpocock:skills/productivity/grilling@49dd158, mattpocock:skills/engineering/grill-with-docs@49dd158, superpowers:skills/brainstorming@bb92a77, pstack:pstack/skills/sharpen@850d7f2, pstack:pstack/skills/figure-it-out@850d7f2 -->
+<!-- house: merge; from: own:skills/tight-spec@pre-merge, mattpocock:skills/engineering/to-spec@49dd158, mattpocock:skills/productivity/grilling@49dd158, mattpocock:skills/engineering/grill-with-docs@49dd158, superpowers:skills/brainstorming@bb92a77, pstack:pstack/skills/sharpen@850d7f2, pstack:pstack/skills/figure-it-out@850d7f2 ; house edit 2026-10-16: state table in Decisions -->
 
 # Tight Spec
 
@@ -92,6 +92,8 @@ Stop interviewing once the next implementation step is clear and bounded. Better
 
 ## Decisions
 <numbered; each marked (user) or (agent call). Modules and interfaces touched, contracts, schema.
+Nontrivial state mechanics: include the state table (states, events, transitions) per the principles
+skill's `state-machine-skeleton`.
 No file paths or code — they go stale. Exception: a prototype snippet that pins a decision better than
 prose (state machine, schema, type shape), trimmed and labeled as from a prototype.>
 

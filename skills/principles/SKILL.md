@@ -1,9 +1,9 @@
 ---
 name: principles
-description: Index of 17 one-rule engineering principles. Use when making or reviewing a nontrivial design or implementation decision, or when the user names a principle or asks which one applies.
+description: Index of 18 one-rule engineering principles. Use when making or reviewing a nontrivial design or implementation decision, or when the user names a principle or asks which one applies.
 ---
 
-<!-- house: merge; from: pstack:pstack/skills/principle-*@850d7f2 (17 kept; encode-lessons-in-structure and laziness-protocol restored from ea32d95, pre-#571). sk-81s.10: cut never-block-on-the-human, exhaust-the-design-space, guard-the-context-window; prove-it-works -> verify-before-claiming, fix-root-causes -> diagnosing-bugs, test-behavior-not-implementation -> tdd/references, subtract-before-you-add -> laziness-protocol. -->
+<!-- house: merge; from: pstack:pstack/skills/principle-*@850d7f2 (17 kept; encode-lessons-in-structure and laziness-protocol restored from ea32d95, pre-#571). sk-81s.10: cut never-block-on-the-human, exhaust-the-design-space, guard-the-context-window; prove-it-works -> verify-before-claiming, fix-root-causes -> diagnosing-bugs, test-behavior-not-implementation -> tdd/references, subtract-before-you-add -> laziness-protocol. 2026-10-16: added own state-machine-skeleton. -->
 
 # Principles
 
@@ -23,6 +23,7 @@ Match the decision to the lines below. Before you apply or cite a principle, rea
 **Architecture**
 
 - `model-the-domain`: stateful logic, heavy branching, repeated shape assumptions → encode the domain in a structure, not conditionals.
+- `state-machine-skeleton`: modes, lifecycles, multi-step flows, input handling, status fields → declare the state machine as a table first, pure `step`, effects as data.
 - `boundary-discipline`: wiring validation, errors, adapters → guards at system boundaries, trust internal types, pure core.
 - `type-system-discipline`: designing types or signatures → illegal states unrepresentable, brand primitives, no lying casts.
 - `make-operations-idempotent`: commands or loops that face crashes and retries → converge to one end state on rerun.
