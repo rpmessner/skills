@@ -1,51 +1,22 @@
-# Agent Instructions
+# House skills
 
-This project uses **bd** (beads) for issue tracking. Run `bd prime` for full workflow context.
+One rationalized agent skill set for Claude Code and pi, built from pinned upstream sources plus my own skills. This repo is the only skill source linked into `~/.claude/skills` and `~/.agents/skills` (pi reads the latter).
 
-> **Architecture in one line:** Issues live in a local Dolt database
-> (`.beads/dolt/`); cross-machine sync uses `bd dolt push/pull` (a
-> git-compatible protocol), stored under `refs/dolt/data` on your git
-> remote — separate from `refs/heads/*` where your code lives.
-> `.beads/issues.jsonl` is a passive export, not the wire protocol.
->
-> See [SYNC_CONCEPTS.md](https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md)
-> for the one-screen overview and anti-patterns (don't treat JSONL as the
-> source of truth; don't `bd import` during normal operation; don't
-> reach for third-party Dolt hosting before trying the default).
+## Layout
 
-## Quick Reference
+- `skills/<name>/SKILL.md` — flat, one dir per house skill. `name:` in front matter must equal the dir name (lowercase, hyphens).
+- `catalog.toml` — the manifest. Every house skill has exactly one `[[skill]]` entry: `job`, `mode` (`own` | `adopt` | `adapt` | `merge`), and `from` (source refs `source:path`). Upstream skills deliberately not taken are `[[drop]]` entries with a `reason`. `[sources.*]` pin each upstream to a full commit.
+- `scripts/check.py` — the gate: manifest ↔ dirs coverage, every `from`/drop ref resolves under its source path (globs allowed), no name collisions, name rules, always-on description token budget. Run before any commit.
+- `scripts/link.py` — links exactly the house skills into the harness dirs and prunes links that point into this repo but no longer exist. `--dry-run` first.
+- `scripts/sync.py` — back-imports upstream changes since each pin as a report plus beads for triage.
 
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
-```
+## Rules
 
-## Non-Interactive Shell Commands
-
-**ALWAYS use non-interactive flags** with file operations to avoid hanging on confirmation prompts.
-
-Shell commands like `cp`, `mv`, and `rm` may be aliased to include `-i` (interactive) mode on some systems, causing the agent to hang indefinitely waiting for y/n input.
-
-**Use these forms instead:**
-```bash
-# Force overwrite without prompting
-cp -f source dest           # NOT: cp source dest
-mv -f source dest           # NOT: mv source dest
-rm -f file                  # NOT: rm file
-
-# For recursive operations
-rm -rf directory            # NOT: rm -r directory
-cp -rf source dest          # NOT: cp -r source dest
-```
-
-**Other commands that may prompt:**
-- `scp` - use `-o BatchMode=yes` for non-interactive
-- `ssh` - use `-o BatchMode=yes` to fail instead of prompting
-- `apt-get` - use `-y` flag
-- `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
+- Sources live read-only in `~/dev/utils/skill-sources/`; never edit them, never link them into a harness.
+- Adopted skills are vendored copies, byte-identical to the pinned source except a provenance comment. Adapted and merged skills carry a provenance comment listing every source ref and pin.
+- One skill per job. Before adding a skill, check `catalog.toml` for an existing job; extend that skill instead.
+- Keep always-on cost low: descriptions are one or two sentences with concrete triggers. Long reference material goes in files the skill loads on demand.
+- Decisions about what to take from upstream are beads (`bd`), not ad hoc notes.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:6cd5cc61 -->
 ## Beads Issue Tracker
