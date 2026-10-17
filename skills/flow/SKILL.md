@@ -32,7 +32,7 @@ Too big or too foggy for one session: `wayfinder`* first; when its map clears, e
 - Raw incoming requests in beads → `triage`*.
 - Reporting a perf number → `benchmark-checklist`*.
 - No scripted way to drive the app → `create-verification-skill`*; audit it later → `maintain-verification-skill`*.
-- User corrected you → the Lessons section of `verify-before-claiming`. Periodic repo-wide sweep → `correct`*. Retrospective on a session's environment → `retro`*.
+- User corrected you → `lessons`. Periodic repo-wide sweep → `correct`*. Retrospective on a session's environment → `retro`*.
 - Prose for people (docs, PR bodies, commits) → `writing-for-people`. Docs agents read (skills, AGENTS.md) → `writing-for-agents`. An article from scratch: `writing-fragments`* (explore), then `writing-shape`* or `writing-beats`* (exploit).
 - Isolated branch → `using-git-worktrees`. Integrating finished work → `finishing-a-development-branch`. PR body → `pr`.
 - Comment cleanup before review → `no-comments`*.

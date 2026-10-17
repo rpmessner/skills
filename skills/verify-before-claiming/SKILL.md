@@ -59,15 +59,7 @@ report gaps instead of rounding them up to "complete".
 
 ## Lessons
 
-Every user correction is a lesson. Before moving on, pick the highest rung that stops a repeat:
-
-1. **Impossible**: change code, types, or data structures so the mistake cannot be written.
-2. **Static analysis**: a lint, compiler check, or CI gate whose error names the fix.
-3. **Guidance**: a rule in `AGENTS.md` or a skill edit.
-4. **Human review**: only when nothing above can catch it.
-
-Make that change now if it is in scope; otherwise file it. Either way record a bead:
-`bd create "<mistake> -> <prevention>" -l lesson -d "rung <n>: <change or follow-up id>"`.
+A user correction runs the `lessons` skill before you move on.
 
 ## Report format
 
