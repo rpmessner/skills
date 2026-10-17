@@ -1,0 +1,11 @@
+{
+  "name": "house-guard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Blocks the same bash commands in pi as the Claude Code PreToolUse hooks in ~/.claude/hooks/.",
+  "keywords": ["pi-package"],
+  "type": "module",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
