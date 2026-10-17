@@ -3,7 +3,7 @@ name: code-review
 description: Review a diff since a fixed point (commit, branch, merge-base) on separate Standards and Spec axes, plus Risk when asked what it could break; and handle review feedback received. Use for "review this branch/PR/since X", "what could this break", or when acting on review comments.
 ---
 
-<!-- house: merge; from: mattpocock:skills/engineering/code-review@49dd158, superpowers:skills/requesting-code-review@bb92a77, superpowers:skills/receiving-code-review@bb92a77, pstack:pstack/skills/blast-radius@850d7f2, pstack:pstack/agents/comment-sicko.md@850d7f2 -->
+<!-- house: merge; from: mattpocock:skills/engineering/code-review@49dd158, superpowers:skills/requesting-code-review@bb92a77, superpowers:skills/receiving-code-review@bb92a77, pstack:pstack/skills/blast-radius@850d7f2, pstack:pstack/agents/comment-sicko.md@850d7f2; house edit 2026-10-16: axes run sequentially unless the user asked for subagents -->
 
 # Code Review
 
@@ -16,7 +16,7 @@ Two jobs: **giving** a review of a diff, and **receiving** review feedback. Revi
 Use the ref the user named (SHA, branch, tag, `main`, `HEAD~5`); ask if none. Then:
 
 - `git rev-parse <ref>` resolves, and `git diff <ref>...HEAD` (three-dot, against the merge-base) is non-empty.
-  Fail here, not inside subagents.
+  Fail here, before any axis runs.
 - Note `git log <ref>..HEAD --oneline`. Include uncommitted work only if the user asked to.
 
 ### 2. Gather context
@@ -29,20 +29,22 @@ Use the ref the user named (SHA, branch, tag, `main`, `HEAD~5`); ask if none. Th
   `references/standards-baseline.md`; documented repo standards override it, and tooling-enforced rules are
   skipped.
 
-### 3. Dispatch the axes in parallel
+### 3. Run the axes
 
-One fresh subagent per axis, all dispatched together, each given precisely crafted context (never your session
-history). Use the `reviewer` agent definition if installed, otherwise a general-purpose subagent with the brief
-pasted in. Briefs: `references/reviewer-briefs.md`.
+Briefs for each axis: `references/reviewer-briefs.md`.
+
+- **Default, and always inside a pi build window:** run the axes yourself, one after another, using each axis's
+  brief as its checklist. Finish and write up one axis before starting the next so they do not blur.
+- **Only when the user asked for subagents:** one fresh subagent per axis, all dispatched together, each given
+  precisely crafted context (never your session history). Use the `reviewer` agent definition if installed,
+  otherwise a general-purpose subagent with the brief pasted in. As the coordinator without that request, ask
+  the user before spawning.
 
 - **Standards**: does the diff follow this repo's documented standards and the baseline?
 - **Spec**: does it do what the spec asked: missing, partial, wrong, or unrequested (scope creep)?
 - **Risk** (only when asked "what could this break", or the diff touches persistence, wire formats, public APIs,
   shared config, or concurrency): what breaks outside the diff, and the one fact it is safe because of, proven by
   running code. Method: `references/blast-radius.md`.
-
-No subagent support in the harness: run the axes yourself sequentially, finishing and writing up one before
-starting the next so they do not blur.
 
 ### 4. Aggregate
 
