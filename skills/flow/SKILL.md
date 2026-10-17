@@ -44,4 +44,4 @@ Setup and one-off skills (`setup-pre-commit`, `git-guardrails-claude-code`, `mig
 ## Operating model
 
 - A coordinator Claude Code session plans and dispatches build sessions as pi agents in named tmux windows → `dispatch` (coordinator only). Each build session reports where its brief says.
-- Claude subagents (Agent tool; pi `subagent`) only when the user asks for them.
+- Claude subagents (Agent tool; pi `subagent`) only when the user asks for them. This overrides any skill that says to dispatch or fan out subagents: run that work sequentially in context instead, or ask first.
