@@ -28,6 +28,11 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
    ## Tickets
    <bead ids; claim each as you start it; close only with evidence>
 
+   ## Skills
+   - `tdd` at these seams: <seams agreed in the spec or ticket, or "none: <reason>">
+   - `verify-before-claiming` before writing the report.
+   - `code-review` on your own diff against <base sha> before printing the marker: Standards and Spec axes (Spec = the tickets above), plus Risk when the diff touches persistence, wire formats, public APIs, shared config, or concurrency. Run the axes one after another in this session; spawn no subagents. Fix every Critical and Important finding, then re-run the gate.
+
    ## Decisions already made
    <user decisions to apply, not re-ask>
 
@@ -38,11 +43,11 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
    <checkable criteria: gate command and its expected result, tests, evidence>
 
    ## Report back
-   Write <report path>: what changed, evidence, anything open, final gate output. Then print <MARKER> alone on the last line.
+   Write <report path>: what changed, evidence, review findings per axis with what you fixed and what you left open, anything else open, final gate output. Then print <MARKER> alone on the last line.
    ```
 
-   Done when every slot is filled and the marker appears only in the last line's instruction.
-3. **Launch:** `$D/pi-window <window> <workdir> <brief-file>`. It refuses duplicate window names.
+   `<base sha>` is `git rev-parse HEAD` in the workdir at dispatch time. Done when every slot is filled and the marker appears only in the last line's instruction.
+3. **Launch:** `$D/pi-window <window> <workdir> <brief-file> [pi-args...]`. It refuses duplicate window names; extra args go to pi (`-e <path>` loads an extension for that run).
 4. **Wait in the background:** run `$D/pi-wait <window> "<MARKER>" 7200` as a background command, then keep working or return control; do not poll by hand. It matches whole lines only (whitespace-trimmed), so the marker quoted in the brief never counts. Exit codes: 0 `DONE`, 3 `EXITED` (pi quit without the marker: read the pane), 4 timeout (session still running: check the pane, re-wait), 2 window gone.
 5. **Follow up** when the session asks, or when the user adds a decision. Send the text and the Enter as two separate commands, and keep the text to one line:
 
@@ -54,12 +59,13 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
    Read the pane with `tmux capture-pane -p -J -S -200 -t :<window>`.
 6. **Close out.**
    1. Read the report file.
-   2. Re-run the repo's gate yourself.
+   2. Re-run the repo's gate yourself, plus its per-ticket close-out check where it has one (form-engine: `.agents/skills/verify-form-engine/verify closeout <bead-id>` for each closed ticket).
    3. Check each claim against the diff and the evidence. A claim you cannot reproduce is open, not done.
-   4. Commit, one commit per slice, only when the user has asked for commits.
-   5. Kill the window: `tmux kill-window -t :<window>`.
+   4. Run `code-review` on the slice's diff against the brief's base sha, axes one after another in your own context; no subagents unless the user asked for them. Send Critical and Important findings back to the session (step 5) or list them as open to the user.
+   5. Commit, one commit per slice, only when the user has asked for commits.
+   6. Kill the window: `tmux kill-window -t :<window>`.
 
-   Done when the gate passes in your own run, every claim is confirmed or listed as open to the user, and the window is gone.
+   Done when the gate passes in your own run, every claim is confirmed or listed as open to the user, no Critical review finding is unresolved, and the window is gone.
 
 ## Dispatch from ready
 
