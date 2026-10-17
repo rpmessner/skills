@@ -25,7 +25,7 @@ scope = "pstack"
 name = "tight-spec"
 job = "spec"
 mode = "merge"
-from = ["mattpocock:skills/engineering/to-spec", "mattpocock:skills/engineering/grill-with-docs", "mattpocock:skills/productivity/grill-me", "superpowers:skills/brainstorming", "pstack:pstack/skills/interrogate", "pstack:pstack/skills/how"]
+from = ["mattpocock:skills/engineering/to-spec", "mattpocock:skills/productivity/grilling", "mattpocock:skills/engineering/grill-with-docs", "superpowers:skills/brainstorming", "pstack:pstack/skills/sharpen", "pstack:pstack/skills/figure-it-out"]
 
 [[skill]]
 name = "verify-before-claiming"
@@ -277,7 +277,7 @@ reason = "Reads Cursor agent-transcripts; context hand-back is covered by handof
 
 [[drop]]
 from = "pstack:pstack/skills/reflect"
-reason = "Reads Cursor agent-transcripts and .cursor paths; routing learnings into edits is the Lessons section of verify-before-claiming."
+reason = "Reads Cursor agent-transcripts and .cursor paths; routing learnings into edits is the house lessons skill."
 
 # --- sk-81s.12: pstack leftovers ---
 
@@ -302,12 +302,16 @@ from = "pstack:pstack/skills/why"
 reason = "Covered by diagnosing-bugs (history and regression hunting); depends on pstack how and Cursor MCP discovery."
 
 [[drop]]
-from = "pstack:pstack/skills/sharpen"
-reason = "Goal-loosening and outside-check ideas taken into tight-spec; its 'don't narrate, just do' stance conflicts with the spec-and-approve gate (drafts/spec-tickets.md)."
+from = "pstack:pstack/skills/interrogate"
+reason = "Multi-model adversarial review hard-wired to Cursor model config; its intent-first step is already tight-spec step 2, and review is code-review's job (drafts/spec-tickets.md)."
 
 [[drop]]
-from = "pstack:pstack/skills/figure-it-out"
-reason = "Falsifiable done and baseline taken into tight-spec, riskiest-first into to-tickets; the rest is pstack playbook machinery (drafts/spec-tickets.md)."
+from = "pstack:pstack/skills/how"
+reason = "Codebase explanation via Cursor-specific explorer/explainer subagents; not a spec skill and not taken (drafts/spec-tickets.md)."
+
+[[drop]]
+from = "mattpocock:skills/productivity/grill-me"
+reason = "One-line router to grilling, which is adopted; tight-spec carries its own interview (drafts/spec-tickets.md)."
 
 [[drop]]
 from = "pstack:pstack/skills/arena"
@@ -426,4 +430,11 @@ mode = "own"
 [[skill]]
 name = "dispatch"
 job = "coordinator-dispatch"
+mode = "own"
+
+# --- correction loop: Lessons moved out of verify-before-claiming ---
+
+[[skill]]
+name = "lessons"
+job = "correction-lessons"
 mode = "own"

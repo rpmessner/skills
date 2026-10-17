@@ -4,7 +4,7 @@ description: "Interview the user into a bounded, measurable spec before building
 disable-model-invocation: true
 ---
 
-<!-- house: merge; from: own:skills/tight-spec@pre-merge, mattpocock:skills/engineering/to-spec@49dd158, mattpocock:skills/productivity/grilling@49dd158, mattpocock:skills/engineering/grill-with-docs@49dd158, superpowers:skills/brainstorming@bb92a77, pstack:pstack/skills/sharpen@850d7f2, pstack:pstack/skills/figure-it-out@850d7f2 ; house edit 2026-10-16: state table in Decisions -->
+<!-- house: merge; from: own:skills/tight-spec@pre-merge, mattpocock:skills/engineering/to-spec@49dd158, mattpocock:skills/productivity/grilling@49dd158, mattpocock:skills/engineering/grill-with-docs@49dd158, superpowers:skills/brainstorming@bb92a77, pstack:pstack/skills/sharpen@850d7f2, pstack:pstack/skills/figure-it-out@850d7f2; not taken (catalog drops): pstack interrogate, pstack how, mattpocock grill-me; house edit 2026-10-16: state table in Decisions -->
 
 # Tight Spec
 
