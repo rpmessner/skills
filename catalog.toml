@@ -21,6 +21,13 @@ pin = "850d7f2e9f5e55dff7eb00a0a479337fe79eb22f"
 # Only this subtree is the pstack plugin; the rest of the repo is other Cursor plugins.
 scope = "pstack"
 
+[sources.humanlayer]
+repo = "https://github.com/humanlayer/skills"
+path = "~/dev/utils/skill-sources/humanlayer-skills"
+pin = "653b6411c1f70c275a18e37673b042ff99f67ceb"
+# Only show-me is taken so far; the rest of the plugins are not in scope.
+scope = "plugins/show-me"
+
 [[skill]]
 name = "board"
 job = "keep-beads-board-current"
@@ -444,3 +451,9 @@ mode = "own"
 name = "lessons"
 job = "correction-lessons"
 mode = "own"
+
+[[skill]]
+name = "show-me"
+job = "explain-visually"
+mode = "adapt"
+from = ["humanlayer:plugins/show-me/skills/show-me"]
