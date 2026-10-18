@@ -13,10 +13,12 @@ Two binding rules:
 ## House rule: stateful features are built on a state machine (binding, not a heuristic)
 
 The one exception to "always judgement calls" (user's standing rule; principle `state-machine-skeleton`).
-Any feature with nontrivial state mechanics (modes, lifecycles, multi-step flows, retries, input handling,
-UI that changes what it accepts) must be built on a declared machine: states, events, transitions, guards
-and effects as a table or the stack's DSL (Zig kit, `Board.Fsm`, shared `Fsm.lua`), with a pure step that
-returns effects as data and the behaviour hung off it. Report as **Important**:
+Scope: workflows (lifecycles, multi-step flows, retries, sync and job pipelines), stateful UI (modes,
+dialogs, wizards, input handling, anything that changes what it accepts), and program business-logic flow:
+the code most likely to be hallucinated or drift, where a declared machine is the app's deterministic
+skeleton. Those must be built on a declared machine: states, events, transitions, guards and effects as a
+table or the stack's DSL (Zig kit, `Board.Fsm`, shared `Fsm.lua`), with a pure step that returns effects as
+data and the behaviour hung off it. Report as **Important**:
 
 - state tracked as booleans, status strings or nullable fields that a `case`/`if` cascade interprets, where
   a machine would declare it;
@@ -24,8 +26,9 @@ returns effects as data and the behaviour hung off it. Report as **Important**:
 - a new stateful feature with no machine, or a machine whose table misses a pair the code handles;
 - effects performed inside the step instead of returned as data.
 
-Not a finding: genuinely stateless code, a single flag with no transitions, or data that changes no handled
-event (show it as data, per the principle).
+Not a finding: computation (numeric cores, parsers, formatters, pure transforms), plumbing and adapters,
+a single flag with no transitions, or data that changes no handled event (show it as data, per the
+principle).
 
 ## Smells (Fowler, *Refactoring* ch. 3): what it is → fix
 
