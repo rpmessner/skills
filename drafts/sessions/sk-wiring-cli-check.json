@@ -1,0 +1,514 @@
+{
+  "scope": "Installed real foreman CLI against in-memory loopback fixture API; no real board, DB or forge writes; responses scripted, not guard/worker verification.",
+  "checks": 21,
+  "records": [
+    {
+      "argv": [
+        "ask",
+        "decision",
+        "scratch-1",
+        "--project",
+        "scratch",
+        "--question",
+        "Which layout?",
+        "--option",
+        "Wide",
+        "--option",
+        "Compact",
+        "--recommendation",
+        "Compact",
+        "--text",
+        "Keep shortcuts."
+      ],
+      "exit": 0,
+      "stdout": "b108b220-926f-4037-b449-51f7a4fbb1c1",
+      "requests": [
+        {
+          "action": "ask",
+          "actor": "pi",
+          "cwd": "<worktree>",
+          "facts": {
+            "options": [
+              "Wide",
+              "Compact"
+            ],
+            "question": "Which layout?",
+            "recommendation": "Compact",
+            "text": "Keep shortcuts."
+          },
+          "id": "scratch-1",
+          "kind": "ticket",
+          "project": "scratch",
+          "request_id": "93ee366f-a44e-4da2-b32b-a02c39b3b349",
+          "request_kind": "decision",
+          "session": "sk-wiring-cli-check"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "b108b220-926f-4037-b449-51f7a4fbb1c1",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"b108b220-926f-4037-b449-51f7a4fbb1c1\",\"note\":null,\"outcome\":{},\"state\":\"pending\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "b108b220-926f-4037-b449-51f7a4fbb1c1",
+          "request_id": "12084c3e-2ff3-4c6c-b278-190c07cee6d5",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "b108b220-926f-4037-b449-51f7a4fbb1c1",
+        "--timeout",
+        "7200"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"b108b220-926f-4037-b449-51f7a4fbb1c1\",\"note\":\"Preserve shortcuts.\",\"outcome\":{\"answer\":\"Compact\"},\"state\":\"answered\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "b108b220-926f-4037-b449-51f7a4fbb1c1",
+          "request_id": "9fefdb56-deeb-4bd7-8ed1-7ba8ed1906e6",
+          "timeout": 7200
+        },
+        {
+          "action": "wait",
+          "id": "b108b220-926f-4037-b449-51f7a4fbb1c1",
+          "request_id": "9fefdb56-deeb-4bd7-8ed1-7ba8ed1906e6",
+          "timeout": 7200
+        }
+      ]
+    },
+    {
+      "argv": [
+        "ask",
+        "push",
+        "scratch-1",
+        "--project",
+        "scratch",
+        "--worktree",
+        "<worktree>",
+        "--branch",
+        "sk-wiring",
+        "--sha",
+        "0fa47daa7a81654f4d239b496f1dfffc121e7dc2",
+        "--remote-branch",
+        "sk-wiring"
+      ],
+      "exit": 0,
+      "stdout": "e30f53b1-e371-47e0-8091-1b46db912a1e",
+      "requests": [
+        {
+          "action": "ask",
+          "actor": "pi",
+          "cwd": "<worktree>",
+          "facts": {
+            "expected_sha": "0fa47daa7a81654f4d239b496f1dfffc121e7dc2",
+            "local_branch": "sk-wiring",
+            "remote_branch": "sk-wiring",
+            "worktree": "<worktree>"
+          },
+          "id": "scratch-1",
+          "kind": "ticket",
+          "project": "scratch",
+          "request_id": "8387ff0e-f61f-4fcb-8f6a-b3189771a3e7",
+          "request_kind": "push",
+          "session": "sk-wiring-cli-check"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "e30f53b1-e371-47e0-8091-1b46db912a1e",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"e30f53b1-e371-47e0-8091-1b46db912a1e\",\"note\":null,\"outcome\":{},\"state\":\"pending\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "e30f53b1-e371-47e0-8091-1b46db912a1e",
+          "request_id": "6d42dee2-4544-446f-b3b7-24c92073ceac",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "e30f53b1-e371-47e0-8091-1b46db912a1e",
+        "--timeout",
+        "7200"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"e30f53b1-e371-47e0-8091-1b46db912a1e\",\"note\":null,\"outcome\":{\"result\":{}},\"state\":\"done\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "e30f53b1-e371-47e0-8091-1b46db912a1e",
+          "request_id": "2c51bd36-4142-4a6c-ae62-081cb30aff9e",
+          "timeout": 7200
+        },
+        {
+          "action": "wait",
+          "id": "e30f53b1-e371-47e0-8091-1b46db912a1e",
+          "request_id": "2c51bd36-4142-4a6c-ae62-081cb30aff9e",
+          "timeout": 7200
+        }
+      ]
+    },
+    {
+      "argv": [
+        "ask",
+        "open_pr",
+        "scratch-1",
+        "--project",
+        "scratch",
+        "--head",
+        "sk-wiring",
+        "--sha",
+        "0fa47daa7a81654f4d239b496f1dfffc121e7dc2",
+        "--base",
+        "main",
+        "--title",
+        "scratch-1: CLI check",
+        "--body-file",
+        "drafts/sessions/.sk-wiring-pr-body.md"
+      ],
+      "exit": 0,
+      "stdout": "a41a707b-0752-44a1-a683-01d08bff2258",
+      "requests": [
+        {
+          "action": "ask",
+          "actor": "pi",
+          "cwd": "<worktree>",
+          "facts": {
+            "base_branch": "main",
+            "body": "Scratch CLI contract only.\n\nNo forge write.\n",
+            "expected_sha": "0fa47daa7a81654f4d239b496f1dfffc121e7dc2",
+            "head_branch": "sk-wiring",
+            "title": "scratch-1: CLI check"
+          },
+          "id": "scratch-1",
+          "kind": "ticket",
+          "project": "scratch",
+          "request_id": "72a4a579-851f-4dc2-964e-4b00839ead13",
+          "request_kind": "open_pr",
+          "session": "sk-wiring-cli-check"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "a41a707b-0752-44a1-a683-01d08bff2258",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"a41a707b-0752-44a1-a683-01d08bff2258\",\"note\":null,\"outcome\":{},\"state\":\"pending\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "a41a707b-0752-44a1-a683-01d08bff2258",
+          "request_id": "16e67dd2-3279-4b8a-8255-d666fe7c8372",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "a41a707b-0752-44a1-a683-01d08bff2258",
+        "--timeout",
+        "7200"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"a41a707b-0752-44a1-a683-01d08bff2258\",\"note\":null,\"outcome\":{\"result\":{}},\"state\":\"done\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "a41a707b-0752-44a1-a683-01d08bff2258",
+          "request_id": "5d091342-7866-428a-8b99-20c910a57546",
+          "timeout": 7200
+        },
+        {
+          "action": "wait",
+          "id": "a41a707b-0752-44a1-a683-01d08bff2258",
+          "request_id": "5d091342-7866-428a-8b99-20c910a57546",
+          "timeout": 7200
+        }
+      ]
+    },
+    {
+      "argv": [
+        "ask",
+        "merge",
+        "scratch-1",
+        "--project",
+        "scratch",
+        "--pr",
+        "42",
+        "--sha",
+        "0fa47daa7a81654f4d239b496f1dfffc121e7dc2"
+      ],
+      "exit": 0,
+      "stdout": "9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56",
+      "requests": [
+        {
+          "action": "ask",
+          "actor": "pi",
+          "cwd": "<worktree>",
+          "facts": {
+            "expected_sha": "0fa47daa7a81654f4d239b496f1dfffc121e7dc2",
+            "number": 42
+          },
+          "id": "scratch-1",
+          "kind": "ticket",
+          "project": "scratch",
+          "request_id": "1b6d6755-fcb5-437c-b8f7-9c1e60b702b7",
+          "request_kind": "merge",
+          "session": "sk-wiring-cli-check"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56\",\"note\":null,\"outcome\":{},\"state\":\"pending\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56",
+          "request_id": "01621e4e-b687-4d3a-bc3e-0198f2834295",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56",
+        "--timeout",
+        "7200"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56\",\"note\":null,\"outcome\":{\"result\":{}},\"state\":\"done\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56",
+          "request_id": "fc01dbe0-3f4f-4e6a-9b8a-b949e0a70da7",
+          "timeout": 7200
+        },
+        {
+          "action": "wait",
+          "id": "9264ace9-c1a5-4ac6-a3e3-ddd25bd41a56",
+          "request_id": "fc01dbe0-3f4f-4e6a-9b8a-b949e0a70da7",
+          "timeout": 7200
+        }
+      ]
+    },
+    {
+      "argv": [
+        "ask",
+        "decision",
+        "scratch-1",
+        "--question",
+        "Continue?",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"4a4270b3-920a-4e09-ab78-b532b88e199a\",\"state\":\"pending\"}",
+      "requests": [
+        {
+          "action": "ask",
+          "actor": "pi",
+          "cwd": "<worktree>",
+          "facts": {
+            "options": [],
+            "question": "Continue?",
+            "recommendation": null,
+            "text": null
+          },
+          "id": "scratch-1",
+          "kind": "ticket",
+          "project": null,
+          "request_id": "a2fc5e70-4a4b-428e-a531-a44833221087",
+          "request_kind": "decision",
+          "session": "sk-wiring-cli-check"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "4a4270b3-920a-4e09-ab78-b532b88e199a",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"4a4270b3-920a-4e09-ab78-b532b88e199a\",\"note\":\"Fixture note\",\"outcome\":{\"reason\":\"fixture\"},\"state\":\"approved\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "4a4270b3-920a-4e09-ab78-b532b88e199a",
+          "request_id": "8626b547-5dbf-4eaa-998b-58c5954cd25c",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "4a4270b3-920a-4e09-ab78-b532b88e199a",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"4a4270b3-920a-4e09-ab78-b532b88e199a\",\"note\":\"Fixture note\",\"outcome\":{\"reason\":\"fixture\"},\"state\":\"executing\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "4a4270b3-920a-4e09-ab78-b532b88e199a",
+          "request_id": "9b82c279-2c87-4cbd-a124-0b02216688ac",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "4a4270b3-920a-4e09-ab78-b532b88e199a",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"4a4270b3-920a-4e09-ab78-b532b88e199a\",\"note\":\"Fixture note\",\"outcome\":{\"reason\":\"fixture\"},\"state\":\"declined\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "4a4270b3-920a-4e09-ab78-b532b88e199a",
+          "request_id": "aebc98e5-fe79-47d5-bb89-ff54b6cb18a8",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "4a4270b3-920a-4e09-ab78-b532b88e199a",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"4a4270b3-920a-4e09-ab78-b532b88e199a\",\"note\":\"Fixture note\",\"outcome\":{\"reason\":\"fixture\"},\"state\":\"withdrawn\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "4a4270b3-920a-4e09-ab78-b532b88e199a",
+          "request_id": "c4bb7891-a0a4-44eb-9a43-ddd181e7aa21",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "4a4270b3-920a-4e09-ab78-b532b88e199a",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"4a4270b3-920a-4e09-ab78-b532b88e199a\",\"note\":\"Fixture note\",\"outcome\":{\"reason\":\"fixture\"},\"state\":\"failed\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "4a4270b3-920a-4e09-ab78-b532b88e199a",
+          "request_id": "eb1168c6-9a62-403f-b472-367d13e5a15f",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "4a4270b3-920a-4e09-ab78-b532b88e199a",
+        "--timeout",
+        "0"
+      ],
+      "exit": 0,
+      "stdout": "{\"id\":\"4a4270b3-920a-4e09-ab78-b532b88e199a\",\"note\":\"Fixture note\",\"outcome\":{\"reason\":\"fixture\"},\"state\":\"superseded\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "4a4270b3-920a-4e09-ab78-b532b88e199a",
+          "request_id": "2e37e8a1-3d1e-484c-a784-f1f71ad73005",
+          "timeout": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "ask",
+        "push",
+        "scratch-1",
+        "--json"
+      ],
+      "exit": 0,
+      "stdout": "{\"warning\":\"foreman refused command: not_committed\"}",
+      "requests": [
+        {
+          "action": "ask",
+          "actor": "pi",
+          "cwd": "<worktree>",
+          "facts": {
+            "expected_sha": null,
+            "local_branch": null,
+            "remote_branch": null,
+            "worktree": null
+          },
+          "id": "scratch-1",
+          "kind": "ticket",
+          "project": null,
+          "request_id": "6242de8e-8a33-4782-b3be-5bad9d4f42f6",
+          "request_kind": "push",
+          "session": "sk-wiring-cli-check"
+        }
+      ]
+    },
+    {
+      "argv": [
+        "wait",
+        "4a4270b3-920a-4e09-ab78-b532b88e199a",
+        "--timeout",
+        "7200"
+      ],
+      "exit": 0,
+      "stdout": "{\"warning\":\"foreman unavailable; read was not queued\"}",
+      "requests": [
+        {
+          "action": "wait",
+          "id": "4a4270b3-920a-4e09-ab78-b532b88e199a",
+          "request_id": "4a7c363e-87c7-42c2-a39d-508bdf2dc261",
+          "timeout": 7200
+        }
+      ]
+    }
+  ]
+}

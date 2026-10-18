@@ -1,6 +1,6 @@
 ---
 name: foreman
-description: Use when managing repo tickets, onboarding with foreman adopt, dispatching or reporting build sessions, reviewing or committing their work, or moving specs into tickets on foreman.
+description: Use when managing repo tickets, build sessions, approvals inbox requests, coordinator close-out, onboarding with foreman adopt, or moving specs into tickets on foreman.
 ---
 
 <!-- house: own -->
@@ -75,6 +75,50 @@ retry blindly, fabricate intermediate events or call a warning a successful boar
 `changes` sends the machine's `request_changes` event. A correction cycle is changes → progress →
 report → review → commit; send review again for the new report. Never emit commit for planned or
 uncommitted work. Board success is not verification and grants no permission to commit or push.
+
+## Approval requests: ask and wait directly
+
+Use `foreman ask` and `foreman wait` directly, **not** `foreman-send`: its five-second cap
+and swallowed exit status are for telemetry, not decisions. Inherit the identity/configuration above.
+Agents never push. Pushes go through board requests; the board worker performs approved actions.
+
+| Kind | Ask (returns a request UUID) |
+| --- | --- |
+| Build-time question | `foreman ask decision <ticket> --question "<question>" --option "<A>" --option "<B>" --recommendation "<A>"` |
+| Push | `foreman ask push <ticket> --worktree <absolute-path> --branch <local-branch> --sha <full-sha> --remote-branch <destination>` |
+| Open PR | `foreman ask open_pr <ticket> --head <remote-branch> --sha <full-sha> --base <base-branch> --title "<title>" --body-file <body.md>` |
+| Merge | `foreman ask merge <ticket> --pr <number> --sha <expected-head-sha>` |
+
+Add `--project <configured-project>` when needed for resolution. Decision options and recommendation
+are optional; `--text "<context>"` adds context. PR body-file bytes are preserved. Use the `pr` skill
+for the body. Merge approval opens the existing confirmation flow; only final confirmation executes it.
+
+Save the returned UUID, then run `foreman wait <request-id> --timeout 7200` (seconds).
+Build sessions wait in their own shell; coordinators wait in the background and consume the outcome
+before the dependent step. Preserve the ID across timeouts; do not post duplicate asks.
+
+Ask/wait exit 0 even on handled refusal, transport failure or timeout. Inspect output, not `$?`:
+plain ask returns a UUID on acceptance, while `--json` returns the response object. A warning is not
+acceptance. Use `ask ... --json` to retain offline receipts: a spooled ask's JSON includes `warning`
+plus `request_id` (plain warning output omits the ID). Retain that ID and wait after service recovery
+instead of re-asking. If no ID was returned, report the unresolved ask before attempting a replacement.
+Wait always prints JSON:
+
+| Wait result | Next step |
+| --- | --- |
+| `state: answered` | Use `outcome.answer` and any `note`; resume the build with that decision. |
+| `state: done` | The action completed; inspect `outcome` before proceeding. |
+| `state: pending`, `approved`, or `executing` | Unresolved, including timeout: wait again on the same ID. |
+| `state: declined` or `withdrawn` | Stop the dependent work; report the state and note. No automatic re-ask. |
+| `state: failed` or `superseded` | Inspect reason and live facts; any replacement needs a new request. For unknown/partial outcomes, observe what happened before proposing another write. |
+| `warning`, missing state or unreadable output | Unresolved, not permission. Retain diagnostics/ID, report the blocker, and resume waiting when available. |
+
+Push/open_pr require board stage `committed`. Do not close the ticket before these requests resolve:
+completion supersedes pending requests. `forge = "none"` ends at commit, without action asks.
+Default-branch pushes are only for one-off tickets without an epic; epic work reaches default through
+PRs. Push binds worktree, local branch, SHA and destination; open_pr binds the remote head SHA and
+base. After push `done`, allow the board's branch snapshot to refresh before asking open_pr; a
+snapshot refusal is not permission to open it directly. Never weaken guards or fabricate stage events.
 
 ## Project-size specs only
 
