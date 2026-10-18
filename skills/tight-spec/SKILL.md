@@ -124,5 +124,5 @@ Before asking for approval, you must be able to answer:
 - What action would exceed the spec and require asking first?
 
 Present the spec with a short list of the calls you made. "Sounds good" to an idea is not approval of a
-spec you haven't shown. Once approved: for a project, invoke `to-tickets` with the spec; for a small
-change, proceed through the normal workflow.
+spec you haven't shown. Once approved: for a project, ask the user to run `/to-tickets <spec>` (it is user-invoked, so the
+Skill tool cannot start it); for a small change, proceed through the normal workflow.
