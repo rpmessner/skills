@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 SCRIPT = Path(__file__).with_name("pi-window")
-SENDER = SCRIPT.parents[2] / "board/scripts/board-send"
+SENDER = SCRIPT.parents[2] / "foreman/scripts/foreman-send"
 
 
 class PiWindowTest(unittest.TestCase):
@@ -28,7 +28,7 @@ class PiWindowTest(unittest.TestCase):
         self.report = self.repo / "report.md"
         self.log = self.root / "events"
         self.env = dict(os.environ, PATH=f"{self.bin}:/usr/bin:/bin", TMUX="fake",
-                        LOG=str(self.log), BOARD_ACTOR="inherited", BOARD_SESSION="old")
+                        LOG=str(self.log), FOREMAN_ACTOR="inherited", FOREMAN_SESSION="old")
         self.executable("tmux", '''import os, subprocess, sys
 args = sys.argv[1:]
 if args[0] == "new-window":
@@ -39,12 +39,12 @@ sys.exit(subprocess.call(["/usr/bin/zsh", "-f", "-c", sys.argv[-1]]))
 ''')
         self.executable("pi", '''import json, os, sys
 with open(os.environ["LOG"], "a") as f:
-    f.write(json.dumps(["pi", os.environ.get("BOARD_ACTOR"), os.environ.get("BOARD_SESSION"), sys.argv[1:]]) + "\\n")
+    f.write(json.dumps(["pi", os.environ.get("FOREMAN_ACTOR"), os.environ.get("FOREMAN_SESSION"), sys.argv[1:]]) + "\\n")
 ''')
-        self.executable("board", '''import json, os, sys
+        self.executable("foreman", '''import json, os, sys
 with open(os.environ["LOG"], "a") as f:
-    f.write(json.dumps(["board", os.environ.get("BOARD_ACTOR"), os.environ.get("BOARD_SESSION"), sys.argv[1:], os.getcwd()]) + "\\n")
-sys.exit(int(os.environ.get("BOARD_EXIT", "0")))
+    f.write(json.dumps(["foreman", os.environ.get("FOREMAN_ACTOR"), os.environ.get("FOREMAN_SESSION"), sys.argv[1:], os.getcwd()]) + "\\n")
+sys.exit(int(os.environ.get("FOREMAN_EXIT", "0")))
 ''')
 
     def executable(self, name, body):
@@ -70,11 +70,11 @@ sys.exit(int(os.environ.get("BOARD_EXIT", "0")))
                              "--", "--model", "provider/model", "-e", "/tmp/extension")
         self.assertEqual(result.returncode, 0, result.stderr)
         events = self.events()
-        self.assertEqual([event[0] for event in events], ["pi", "board", "board"])
+        self.assertEqual([event[0] for event in events], ["pi", "foreman", "foreman"])
         self.assertEqual(events[0][3], ["--name", "slice", "--model", "provider/model",
                                        "-e", "/tmp/extension", "Build this slice."])
         for event, ticket in zip(events[1:], ["sk-1", "sk-2"]):
-            self.assertEqual(event, ["board", "pi", "slice", ["dispatch", ticket,
+            self.assertEqual(event, ["foreman", "pi", "slice", ["dispatch", ticket,
                 "--window", "slice", "--harness", "pi", "--model", "provider/model",
                 "--workdir", str(self.repo), "--branch", "build", "--base", self.base,
                 "--brief", str(self.brief), "--report", str(self.report)], str(self.repo)])
@@ -91,22 +91,22 @@ sys.exit(int(os.environ.get("BOARD_EXIT", "0")))
         return self.launch("--bead", "sk-1", "--bead", "sk-2", "--report", str(self.report))
 
     def test_missing_board_warns_once_and_still_launches(self):
-        (self.bin / "board").unlink()
+        (self.bin / "foreman").unlink()
         result = self.tracked_launch()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual([event[0] for event in self.events()], ["pi"])
         self.assertEqual(len(result.stderr.splitlines()), 1, result.stderr)
-        self.assertIn("warning: board", result.stderr)
+        self.assertIn("warning: foreman", result.stderr)
 
     def test_refused_or_failed_board_never_fails_launch_or_skips_next_ticket(self):
         for code in (3, 1, 127):
             with self.subTest(code=code):
                 self.log.unlink(missing_ok=True)
-                self.env["BOARD_EXIT"] = str(code)
+                self.env["FOREMAN_EXIT"] = str(code)
                 result = self.tracked_launch()
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual([event[0] for event in self.events()], ["pi", "board", "board"])
-                self.assertIn("warning: board", result.stderr)
+                self.assertEqual([event[0] for event in self.events()], ["pi", "foreman", "foreman"])
+                self.assertIn("warning: foreman", result.stderr)
 
     def test_relative_report_and_pi_model_forms(self):
         for model_args in (("-m", "provider/model"), ("--model=provider/model",)):
@@ -136,13 +136,13 @@ sys.exit(int(os.environ.get("BOARD_EXIT", "0")))
         self.assertFalse(self.log.exists())
 
     def test_report_refusal_cannot_prevent_done_marker_under_errexit(self):
-        self.env["BOARD_EXIT"] = "3"
+        self.env["FOREMAN_EXIT"] = "3"
         result = subprocess.run(["bash", "-ec",
             'bash "$1" report sk-1 --path "$2"; echo "SLICE DONE"',
             "test", str(SENDER), str(self.report)], env=self.env, text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), "SLICE DONE")
-        self.assertIn("warning: board exited 3", result.stderr)
+        self.assertIn("warning: foreman exited 3", result.stderr)
         self.assertEqual(self.events()[0][3], ["report", "sk-1", "--path", str(self.report)])
 
     def test_missing_timeout_skips_board_with_warning(self):
@@ -160,11 +160,11 @@ sys.exit(int(os.environ.get("BOARD_EXIT", "0")))
         self.assertFalse(self.log.exists())
 
     def test_hung_board_is_bounded_and_launch_survives(self):
-        self.executable("board", "import time\ntime.sleep(60)\n")
+        self.executable("foreman", "import time\ntime.sleep(60)\n")
         result = self.launch("--bead", "sk-1")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.events()[0][0], "pi")
-        self.assertIn("warning: board", result.stderr)
+        self.assertIn("warning: foreman", result.stderr)
 
 
 if __name__ == "__main__":

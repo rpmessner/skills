@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Best-effort foreman CLI: same arguments, bounded wait, always exits zero.
+if ! command -v foreman >/dev/null 2>&1; then
+  echo "warning: foreman not installed; continuing" >&2
+elif ! command -v timeout >/dev/null 2>&1; then
+  echo "warning: foreman skipped (timeout unavailable); continuing" >&2
+else
+  timeout --kill-after=1s 5s foreman "$@"
+  status=$?
+  if [ "$status" -ne 0 ]; then
+    echo "warning: foreman exited $status; continuing (do not retry refused claims blindly)" >&2
+  fi
+fi
+exit 0

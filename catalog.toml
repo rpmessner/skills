@@ -29,8 +29,8 @@ pin = "653b6411c1f70c275a18e37673b042ff99f67ceb"
 scope = "plugins/show-me"
 
 [[skill]]
-name = "board"
-job = "keep-beads-board-current"
+name = "foreman"
+job = "keep-foreman-current"
 mode = "own"
 from = []
 

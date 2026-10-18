@@ -38,11 +38,11 @@ words (the user can override):
 
 If it grows mid-interview, stop, say so, and step up a size.
 
-For a project only, use the `board` skill to create/reuse a draft epic (slug, configured project, spec path); keep that identity for the handoff, even if the board is unavailable.
+For a project only, use the `foreman` skill to create/reuse a draft epic (slug, configured project, spec path); keep that identity for the handoff, even if the board is unavailable.
 
 ## 3. Interview
 
-Use the `board` skill to send `epic spec` (`start_spec`) for the project draft as the interview starts; if skipping the interview, send it before synthesizing step 4.
+Use the `foreman` skill to send `epic spec` (`start_spec`) for the project draft as the interview starts; if skipping the interview, send it before synthesizing step 4.
 
 **Facts are your job; decisions are the user's.** Never ask the user something you can look up (code,
 config, docs, tool output). Explore yourself, or dispatch a read-only subagent for wide searches; ask
@@ -130,4 +130,4 @@ Present the spec with a short list of the calls you made. "Sounds good" to an id
 spec you haven't shown. Once approved: for a project, ask the user to run `/to-tickets <spec>` (it is user-invoked, so the
 Skill tool cannot start it); for a small change, proceed through the normal workflow.
 
-On project-spec approval, use the `board` skill to send `epic approve` (`approve_spec`) with the saved spec path; pass the draft slug, project and path to `to-tickets`.
+On project-spec approval, use the `foreman` skill to send `epic approve` (`approve_spec`) with the saved spec path; pass the draft slug, project and path to `to-tickets`.

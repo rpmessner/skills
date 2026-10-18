@@ -45,21 +45,21 @@ branch=$(git -C "$dir" branch --show-current 2>/dev/null) || branch=unknown
 branch=${branch:-detached}
 report=${report:-drafts/sessions/$name.md}
 [[ $report = /* ]] || report="$dir/$report"
-launch="export BOARD_ACTOR=pi BOARD_SESSION=$name; pi --name \"$name\"$extra \"\$(<$(printf '%q' "$brief"))\"; echo; echo \"[pi exited] press enter\"; read"
+launch="export FOREMAN_ACTOR=pi FOREMAN_SESSION=$name; pi --name \"$name\"$extra \"\$(<$(printf '%q' "$brief"))\"; echo; echo \"[pi exited] press enter\"; read"
 launch=${launch//\'/\'\\\'\'}
 tmux new-window -d -n "$name" -c "$dir" "zsh -ic '$launch'"
 tmux set-option -w -t ":$name" automatic-rename off >/dev/null
 echo "launched pi in window '$name' ($dir)"
 if [ "${#beads[@]}" -gt 0 ]; then
-  if ! command -v board >/dev/null 2>&1; then
-    echo "warning: board not installed; continuing" >&2
+  if ! command -v foreman >/dev/null 2>&1; then
+    echo "warning: foreman not installed; continuing" >&2
   else
-    sender=$(dirname "$(realpath "$0")")/../../board/scripts/board-send
+    sender=$(dirname "$(realpath "$0")")/../../foreman/scripts/foreman-send
     for id in "${beads[@]}"; do
-      (cd "$dir"; BOARD_ACTOR=pi BOARD_SESSION="$name" bash "$sender" dispatch "$id" \
+      (cd "$dir"; FOREMAN_ACTOR=pi FOREMAN_SESSION="$name" bash "$sender" dispatch "$id" \
         --window "$name" --harness pi --model "$model" --workdir "$dir" \
         --branch "$branch" --base "$base" --brief "$brief" --report "$report") || \
-        echo "warning: board adapter unavailable; continuing" >&2
+        echo "warning: foreman adapter unavailable; continuing" >&2
     done
   fi
 fi
