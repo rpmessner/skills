@@ -1,0 +1,504 @@
+#!/usr/bin/env python3
+"""Worktree previews; Python stdlib, systemd user services and PostgreSQL tools."""
+import argparse
+import base64
+import fcntl
+import getpass
+import hashlib
+import json
+import os
+import re
+import shlex
+import signal
+import socket
+import subprocess
+import sys
+import tempfile
+import time
+import tomllib
+from pathlib import Path
+from urllib.parse import quote
+
+
+def load_config(path):
+    with open(path, 'rb') as handle:
+        config = tomllib.load(handle)
+    if set(config) != {'apps'} or not isinstance(config['apps'], list):
+        raise ValueError('config requires [[apps]]')
+    apps = config['apps']
+    seen = set()
+    allowed = {'name', 'path', 'ports', 'start', 'env_file', 'env', 'data',
+               'source_database', 'migrate', 'seed', 'main_units'}
+    for app in apps:
+        if not isinstance(app, dict) or set(app) - allowed:
+            raise ValueError('unknown app fields')
+        name = app.get('name', '')
+        if not isinstance(name, str) or not re.fullmatch(r'[a-z][a-z0-9_]{0,19}', name):
+            raise ValueError('name must be a short lowercase identifier')
+        if name in seen:
+            raise ValueError(f'duplicate app {name}')
+        seen.add(name)
+        for key in ('path', 'env_file'):
+            value = app.get(key)
+            if key == 'env_file' and value is None:
+                continue
+            if not isinstance(value, str) or not Path(value).is_absolute() or any(c in value for c in '\n\r\0%'):
+                raise ValueError(f'{name}: {key} must be an absolute literal path')
+        ports = app.get('ports')
+        if (not isinstance(ports, list) or len(ports) != 2 or
+                any(type(p) is not int for p in ports) or not 1024 <= ports[0] <= ports[1] <= 65535):
+            raise ValueError(f'{name}: ports must be [first, last], 1024..65535')
+        if app.get('data') not in ('copy', 'fresh'):
+            raise ValueError(f'{name}: data must be copy or fresh')
+        source = app.get('source_database', '')
+        if app['data'] == 'copy' and (not isinstance(source, str) or not re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]{0,62}', source)):
+            raise ValueError(f'{name}: source_database must be a database name, not a URL')
+        for key in ('start', 'migrate') + (('seed',) if app['data'] == 'fresh' else ()):
+            value = app.get(key)
+            if not isinstance(value, list) or not value or any(not isinstance(v, str) or not v or '\0' in v for v in value):
+                raise ValueError(f'{name}: {key} must be a nonempty argv array')
+        env = app.setdefault('env', {})
+        if not isinstance(env, dict) or any(
+                not re.fullmatch(r'[A-Z_][A-Z0-9_]*', k) or not isinstance(v, str) or
+                any(c in v for c in '\n\r\0') or k in ('PORT', 'DATABASE_URL', 'PREVIEW') or
+                k.startswith(('DEVSERVE_', 'PG', 'NOTIFY_')) or
+                any(word in k for word in ('PASSWORD', 'SECRET', 'TOKEN', 'KEY'))
+                for k, v in env.items()):
+            raise ValueError(f'{name}: env must contain plain, non-reserved variables; use env_file for secrets')
+        units = app.setdefault('main_units', [])
+        if not isinstance(units, list) or any(not isinstance(u, str) or not re.fullmatch(r'[a-zA-Z0-9_.@-]+\.service', u) for u in units):
+            raise ValueError(f'{name}: main_units must be service names')
+    for i, app in enumerate(apps):
+        for other in apps[i + 1:]:
+            if max(app['ports'][0], other['ports'][0]) <= min(app['ports'][1], other['ports'][1]):
+                raise ValueError(f'overlapping ports: {app["name"]} and {other["name"]}')
+    return apps
+
+
+def names(app, worktree):
+    path = str(Path(worktree).resolve())
+    suffix = hashlib.sha256(path.encode()).hexdigest()[:12]
+    slug = re.sub('[^a-z0-9]+', '_', Path(path).name.lower()).strip('_')[:20] or 'tree'
+    return f'devserve-{app}-{slug}-{suffix}.service', f'{app}_preview_{slug}_{suffix}'
+
+
+def choose_port(ports, claimed):
+    for port in range(ports[0], ports[1] + 1):
+        if port in claimed:
+            continue
+        try:
+            with socket.socket(socket.AF_INET6) as sock:
+                sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+                sock.bind(('::', port))
+                return port
+        except OSError:
+            continue
+    raise ValueError('no free port in app range')
+
+
+TRANSITIONS = {
+    ('absent', 'up'): ('starting', ('prepare', 'launch')),
+    ('stopped', 'up'): ('starting', ('prepare', 'launch')),
+    ('failed', 'up'): ('starting', ('prepare', 'launch')),
+    ('running', 'up'): ('running', ()),
+    ('starting', 'ready'): ('running', ()),
+    ('starting', 'error'): ('failed', ('rollback',)),
+    ('running', 'error'): ('failed', ('terminate',)),
+    ('running', 'down'): ('stopped', ('terminate',)),
+    ('starting', 'down'): ('stopped', ('terminate', 'rollback')),
+    ('stopped', 'down'): ('stopped', ()),
+    ('failed', 'down'): ('stopped', ('terminate',)),
+    ('stopped', 'drop'): ('absent', ('drop',)),
+    ('failed', 'drop'): ('absent', ('drop',)),
+}
+
+
+def step(state, event):
+    try:
+        return TRANSITIONS[state, event]
+    except KeyError:
+        raise ValueError(f'invalid lifecycle event: {state}/{event}') from None
+
+
+def run(argv, **kwargs):
+    data = kwargs.pop('input', None)
+    with subprocess.Popen(argv, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          stdin=subprocess.PIPE if data is not None else subprocess.DEVNULL,
+                          start_new_session=True, **kwargs) as process:
+        try:
+            stdout, _ = process.communicate(input=data, timeout=120)
+        except BaseException:
+            terminate(process)
+            raise
+        if process.returncode:
+            # Child diagnostics may contain credentials. Journald is not a secret transport.
+            raise ValueError(f'{Path(argv[0]).name} failed (exit {process.returncode})')
+        return stdout.strip()
+
+
+def encode(meta):
+    return base64.urlsafe_b64encode(json.dumps(meta).encode()).decode()
+
+
+def decode(value):
+    return json.loads(base64.urlsafe_b64decode(value))
+
+
+def properties(unit):
+    output = run(['systemctl', '--user', 'show', unit, '--property=Environment,ActiveState,SubState,StatusText,MainPID'])
+    return dict(line.split('=', 1) for line in output.splitlines() if '=' in line)
+
+
+def registry():
+    output = run(['systemctl', '--user', 'list-units', '--all', '--plain', '--no-legend', 'devserve-*.service'])
+    rows = []
+    for line in output.splitlines():
+        unit = line.split()[0]
+        props = properties(unit)
+        values = dict(item.split('=', 1) for item in shlex.split(props.get('Environment', '')) if '=' in item)
+        if 'DEVSERVE_META' not in values:
+            continue
+        meta = decode(values['DEVSERVE_META'])
+        if names(meta['app'], meta['worktree']) != (unit, meta['database']):
+            raise ValueError('invalid devserve unit metadata')
+        state = props.get('StatusText', '')
+        if props.get('ActiveState') == 'failed':
+            state = 'failed'
+        if state not in ('starting', 'running', 'failed', 'stopped'):
+            state = 'starting'
+        rows.append(dict(meta, state=state, missing=not Path(meta['worktree']).is_dir(),
+                         pid=int(props.get('MainPID', '0'))))
+    return rows
+
+
+def notify(state):
+    address = os.environ.get('NOTIFY_SOCKET')
+    if address:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as sock:
+            sock.connect('\0' + address[1:] if address.startswith('@') else address)
+            sock.sendall(f'STATUS={state}'.encode())
+
+
+def sql(statement):
+    return run(['psql', '-XAt', '-v', 'ON_ERROR_STOP=1', '-d', 'postgres'], input=statement)
+
+
+def ownership(meta):
+    return 'devserve:v1:' + meta['unit'] + ':' + hashlib.sha256(meta['worktree'].encode()).hexdigest()
+
+
+def database_status(meta):
+    database = meta['database']
+    if names(meta['app'], meta['worktree']) != (meta['unit'], database):
+        raise ValueError('invalid database identity')
+    result = sql(f"SELECT COALESCE(shobj_description(oid, 'pg_database'), '') FROM pg_database WHERE datname = '{database}';")
+    exists = sql(f"SELECT count(*) FROM pg_database WHERE datname = '{database}';") == '1'
+    if exists and result != ownership(meta):
+        raise ValueError('refusing database not created by devserve')
+    return exists
+
+
+def drop_database(meta):
+    if database_status(meta):
+        sql(f'DROP DATABASE "{meta["database"]}" WITH (FORCE);')
+
+
+def app_environment(meta):
+    env = dict(os.environ)
+    user = quote(env.get('PGUSER', getpass.getuser()), safe='')
+    password = quote(env.get('PGPASSWORD', ''), safe='')
+    host = env.get('PGHOST', 'localhost')
+    if ':' in host and not host.startswith('['):
+        host = '[' + host + ']'
+    env['DATABASE_URL'] = f'postgresql://{user}:{password}@{host}:{env.get("PGPORT", "5432")}/{meta["database"]}'
+    env.update(PORT=str(meta['port']), PREVIEW='1')
+    env.pop('NOTIFY_SOCKET', None)
+    env.pop('DEVSERVE_META', None)
+    return env
+
+
+def prepare(meta):
+    exists = database_status(meta)
+    database = meta['database']
+    if not exists:
+        sql(f'CREATE DATABASE "{database}";')
+        sql(f"COMMENT ON DATABASE \"{database}\" IS '{ownership(meta)}';")
+    try:
+        app = meta['config']
+        if not exists and app['data'] == 'copy':
+            with tempfile.TemporaryDirectory(prefix='devserve-dump-') as directory:
+                dump = str(Path(directory) / 'data.dump')
+                run(['pg_dump', '--format=custom', '--no-owner', '--no-acl', '--file', dump, app['source_database']])
+                run(['pg_restore', '--exit-on-error', '--no-owner', '--no-acl', '--dbname', database, dump])
+        env = app_environment(meta)
+        run(app['migrate'], cwd=meta['worktree'], env=env)
+        if not exists and app['data'] == 'fresh':
+            run(app['seed'], cwd=meta['worktree'], env=env)
+    except BaseException:
+        if not exists:
+            drop_database(meta)
+        raise
+    return not exists
+
+
+def terminate(child):
+    if child is None:
+        return
+    try:
+        os.killpg(child.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    try:
+        child.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        os.killpg(child.pid, signal.SIGKILL)
+        child.wait(timeout=5)
+    try:
+        os.killpg(child.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+
+
+class StartupCancelled(Exception):
+    pass
+
+
+def worker(meta):
+    state = meta.get('state', 'absent')
+    child = None
+    created = False
+    events = []
+
+    def stop_requested(*_):
+        if state == 'starting':
+            raise StartupCancelled()
+        events.append('down')
+
+    signal.signal(signal.SIGTERM, stop_requested)
+
+    def transition(event):
+        nonlocal state, child, created
+        state, effects = step(state, event)
+        try:
+            for effect in effects:
+                if effect == 'prepare':
+                    created = prepare(meta)
+                elif effect == 'launch':
+                    child = subprocess.Popen(meta['config']['start'], cwd=meta['worktree'],
+                                             env=app_environment(meta), start_new_session=True)
+                elif effect == 'terminate':
+                    terminate(child)
+                elif effect == 'rollback':
+                    terminate(child)
+                    if created:
+                        drop_database(meta)
+        finally:
+            notify(state)
+
+    try:
+        transition('up')
+        deadline = time.monotonic() + 30
+        while state in ('starting', 'running'):
+            if events:
+                transition(events.pop(0))
+            elif child.poll() is not None:
+                transition('error')
+            elif state == 'starting':
+                try:
+                    with socket.create_connection(('127.0.0.1', meta['port']), timeout=0.1):
+                        transition('ready')
+                except OSError:
+                    if time.monotonic() >= deadline:
+                        transition('error')
+            time.sleep(0.05)
+    except StartupCancelled:
+        transition('down')
+    except BaseException:
+        if state in ('starting', 'running'):
+            transition('error')
+        print('devserve: preview setup failed; check commands and database access', file=sys.stderr)
+    finally:
+        terminate(child)
+    return 0
+
+
+def service_command(meta):
+    command = ['systemd-run', '--user', '--quiet', '--expand-environment=no']
+    if meta['config'].get('env_file'):
+        command += ['--property=EnvironmentFile=' + meta['config']['env_file']]
+    command += ['--setenv=DEVSERVE_META=' + encode(meta)]
+    for key, value in meta['config']['env'].items():
+        command += ['--setenv=' + key + '=' + value]
+    command += ['--setenv=PORT=' + str(meta['port']), '--setenv=PREVIEW=1']
+    return command
+
+
+def drop_service_database(meta):
+    run(service_command(meta) + ['--wait', '--pipe', '--collect',
+        '--unit=' + meta['unit'].removesuffix('.service') + '-cleanup',
+        sys.executable, str(Path(__file__).resolve()), '_drop'])
+
+
+def wait_state(unit, wanted, timeout=150):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        rows = registry()
+        row = next((r for r in rows if r['unit'] == unit), None)
+        if row and row['state'] in wanted:
+            return row
+        time.sleep(0.1)
+    raise ValueError('preview transition timed out; inspect devserve ls/logs')
+
+
+def common_dir(path):
+    return Path(run(['git', '-C', str(path), 'rev-parse', '--path-format=absolute', '--git-common-dir'])).resolve()
+
+
+def up(apps, worktree):
+    worktree = Path(worktree).resolve()
+    common = common_dir(worktree)
+    matches = [app for app in apps if common_dir(app['path']) == common]
+    if len(matches) != 1:
+        raise ValueError('worktree must match exactly one configured app by git common dir')
+    app = matches[0]
+    unit, database = names(app['name'], worktree)
+    rows = registry()
+    existing = next((row for row in rows if row['unit'] == unit), None)
+    initial = existing['state'] if existing else 'absent'
+    _, effects = step(initial, 'up')
+    if not effects:
+        print(existing['url'])
+        return
+    if existing:
+        run(['systemctl', '--user', 'stop', unit])
+    port = choose_port(app['ports'], {row['port'] for row in rows if row['unit'] != unit})
+    meta = dict(app=app['name'], unit=unit, worktree=str(worktree), database=database,
+                branch=run(['git', '-C', str(worktree), 'rev-parse', '--abbrev-ref', 'HEAD']),
+                owner=os.environ.get('FOREMAN_SESSION') or getpass.getuser(), port=port,
+                url=f'http://127.0.0.1:{port}', config=app, state=initial)
+    run(service_command(meta) + ['--unit=' + unit, '--description=' + unit,
+        '--remain-after-exit', '--service-type=exec', '--property=NotifyAccess=all',
+        '--property=TimeoutStopSec=15', '--working-directory=' + str(worktree),
+        sys.executable, str(Path(__file__).resolve()), '_worker'])
+    try:
+        row = wait_state(unit, {'running', 'failed', 'stopped'})
+    except (KeyboardInterrupt, ValueError):
+        current = next((r for r in registry() if r['unit'] == unit), None)
+        if current:
+            down(current, False)
+        raise
+    if row['state'] != 'running':
+        wait_worker_exit(unit)
+        raise ValueError(f'preview failed: {unit}; use logs, then down --drop-db')
+    print(meta['url'])
+
+
+def wait_worker_exit(unit):
+    deadline = time.monotonic() + 30
+    while properties(unit).get('MainPID') != '0':
+        if time.monotonic() > deadline:
+            raise ValueError('worker did not stop')
+        time.sleep(0.05)
+
+
+def down(row, drop):
+    if row['pid']:
+        run(['systemctl', '--user', 'kill', '--kill-whom=main', '--signal=SIGTERM', row['unit']])
+        row = wait_state(row['unit'], {'stopped', 'failed'}, timeout=30)
+        wait_worker_exit(row['unit'])
+    target, _ = step(row['state'], 'down')
+    if not drop and target != row['state']:
+        run(['systemctl', '--user', 'stop', row['unit']])
+        run(['systemd-run', '--user', '--quiet', '--expand-environment=no',
+             '--unit=' + row['unit'], '--description=' + row['unit'],
+             '--remain-after-exit', '--service-type=exec', '--property=NotifyAccess=all',
+             '--setenv=DEVSERVE_META=' + encode(row),
+             sys.executable, str(Path(__file__).resolve()), '_stopped'])
+        wait_state(row['unit'], {target}, timeout=10)
+    if drop:
+        _, effects = step(row['state'], 'drop')
+        if 'drop' in effects:
+            drop_service_database(row)
+        run(['systemctl', '--user', 'stop', row['unit']])
+        subprocess.run(['systemctl', '--user', 'reset-failed', row['unit']], capture_output=True)
+    print(row['unit'] + (' removed' if drop else ' stopped (database kept)'))
+
+
+def main():
+    if len(sys.argv) == 2 and sys.argv[1] in ('_worker', '_drop', '_stopped'):
+        meta = decode(os.environ['DEVSERVE_META'])
+        if sys.argv[1] == '_stopped':
+            state, _ = step(meta['state'], 'down')
+            notify(state)
+            return 0
+        if sys.argv[1] == '_worker':
+            return worker(meta)
+        drop_database(meta)
+        return 0
+    parser = argparse.ArgumentParser(description=__doc__)
+    commands = parser.add_subparsers(dest='command', required=True)
+    up_parser = commands.add_parser('up')
+    up_parser.add_argument('worktree', nargs='?', default='.')
+    commands.add_parser('ls').add_argument('--json', action='store_true')
+    logs = commands.add_parser('logs')
+    logs.add_argument('target')
+    logs.add_argument('-f', '--follow', action='store_true')
+    stop = commands.add_parser('down')
+    stop.add_argument('preview')
+    stop.add_argument('--drop-db', action='store_true')
+    commands.add_parser('gc')
+    args = parser.parse_args()
+    config = Path(os.environ.get('DEVSERVE_CONFIG_DIR', str(Path.home() / '.config/devserve'))) / 'apps.toml'
+    apps = load_config(config)
+    if args.command == 'logs':
+        targets = [r['unit'] for r in registry() if r['unit'].removesuffix('.service') == args.target.removesuffix('.service')]
+        targets += [u for app in apps if app['name'] == args.target for u in app['main_units']]
+        if not targets:
+            raise ValueError('unknown preview or app')
+        argv = ['journalctl', '--user', '--no-pager', '-n', '100']
+        for target in targets:
+            argv += ['-u', target]
+        if args.follow:
+            argv += ['-f']
+        os.execvp(argv[0], argv)
+    if args.command == 'ls':
+        previews = [{k: v for k, v in row.items() if k not in ('config', 'pid')} for row in registry()]
+        mains = [dict(app=app['name'], unit=unit, state=properties(unit).get('ActiveState', 'unknown'))
+                 for app in apps for unit in app['main_units']]
+        if args.json:
+            print(json.dumps(dict(previews=previews, main_units=mains), sort_keys=True))
+        else:
+            for row in previews:
+                print(f'{row["unit"]} app={row["app"]} branch={row["branch"]} port={row["port"]} '
+                      f'{row["url"]} owner={row["owner"]} state={row["state"]}' + (' MISSING' if row['missing'] else ''))
+            for row in mains:
+                print(f'{row["unit"]} app={row["app"]} main state={row["state"]}')
+        return 0
+    runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/run/user/{os.getuid()}'))
+    with open(runtime / 'devserve.lock', 'a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if args.command == 'up':
+            up(apps, args.worktree)
+        else:
+            rows = registry()
+            if args.command == 'gc':
+                for row in rows:
+                    if row['missing']:
+                        down(row, True)
+            else:
+                row = next((r for r in rows if r['unit'].removesuffix('.service') == args.preview.removesuffix('.service')), None)
+                if not row:
+                    raise ValueError('unknown preview')
+                down(row, args.drop_db)
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print('devserve: interrupted; preview stopped', file=sys.stderr)
+        sys.exit(130)
+    except (ValueError, OSError, subprocess.TimeoutExpired) as error:
+        print(f'devserve: {error}', file=sys.stderr)
+        sys.exit(1)

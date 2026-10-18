@@ -1,0 +1,43 @@
+.....................
+----------------------------------------------------------------------
+Ran 21 tests in 27.493s
+
+OK
+$ devserve up /tmp/devserve test-d3qbzfmk/one
+http://127.0.0.1:45149
+
+$ devserve up /tmp/devserve test-d3qbzfmk/two
+http://127.0.0.1:45150
+
+$ devserve ls --json
+{"main_units": [{"app": "devserve_test2019886", "state": "inactive", "unit": "devserve-devserve_test2019886-main.service"}], "previews": [{"app": "devserve_test2019886", "branch": "one", "database": "devserve_test2019886_preview_one_bd268dd95662", "missing": false, "owner": "stub-session", "port": 45149, "state": "running", "unit": "devserve-devserve_test2019886-one-bd268dd95662.service", "url": "http://127.0.0.1:45149", "worktree": "/tmp/devserve test-d3qbzfmk/one"}, {"app": "devserve_test2019886", "branch": "two", "database": "devserve_test2019886_preview_two_2c62393b8bcb", "missing": false, "owner": "stub-session", "port": 45150, "state": "running", "unit": "devserve-devserve_test2019886-two-2c62393b8bcb.service", "url": "http://127.0.0.1:45150", "worktree": "/tmp/devserve test-d3qbzfmk/two"}]}
+
+$ devserve ls
+devserve-devserve_test2019886-one-bd268dd95662.service app=devserve_test2019886 branch=one port=45149 http://127.0.0.1:45149 owner=stub-session state=running
+devserve-devserve_test2019886-two-2c62393b8bcb.service app=devserve_test2019886 branch=two port=45150 http://127.0.0.1:45150 owner=stub-session state=running
+devserve-devserve_test2019886-main.service app=devserve_test2019886 main state=inactive
+
+$ devserve logs devserve-devserve_test2019886-one-bd268dd95662.service
+Oct 18 17:44:09 ORGANIC-PC systemd[737]: Starting devserve-devserve_test2019886-one-bd268dd95662.service...
+Oct 18 17:44:09 ORGANIC-PC systemd[737]: Started devserve-devserve_test2019886-one-bd268dd95662.service.
+Oct 18 17:44:10 ORGANIC-PC python3[2020058]: stub-ready
+Oct 18 17:44:10 ORGANIC-PC python3[2020058]: 127.0.0.1 - - [18/Oct/2026 17:44:10] "GET / HTTP/1.1" 200 -
+
+$ devserve down devserve-devserve_test2019886-one-bd268dd95662.service
+devserve-devserve_test2019886-one-bd268dd95662.service stopped (database kept)
+
+$ devserve ls --json
+{"main_units": [{"app": "devserve_test2019886", "state": "inactive", "unit": "devserve-devserve_test2019886-main.service"}], "previews": [{"app": "devserve_test2019886", "branch": "one", "database": "devserve_test2019886_preview_one_bd268dd95662", "missing": false, "owner": "stub-session", "port": 45149, "state": "stopped", "unit": "devserve-devserve_test2019886-one-bd268dd95662.service", "url": "http://127.0.0.1:45149", "worktree": "/tmp/devserve test-d3qbzfmk/one"}, {"app": "devserve_test2019886", "branch": "two", "database": "devserve_test2019886_preview_two_2c62393b8bcb", "missing": false, "owner": "stub-session", "port": 45150, "state": "running", "unit": "devserve-devserve_test2019886-two-2c62393b8bcb.service", "url": "http://127.0.0.1:45150", "worktree": "/tmp/devserve test-d3qbzfmk/two"}]}
+
+$ devserve down devserve-devserve_test2019886-one-bd268dd95662.service --drop-db
+devserve-devserve_test2019886-one-bd268dd95662.service removed
+
+$ devserve ls --json
+{"main_units": [{"app": "devserve_test2019886", "state": "inactive", "unit": "devserve-devserve_test2019886-main.service"}], "previews": [{"app": "devserve_test2019886", "branch": "two", "database": "devserve_test2019886_preview_two_2c62393b8bcb", "missing": true, "owner": "stub-session", "port": 45150, "state": "running", "unit": "devserve-devserve_test2019886-two-2c62393b8bcb.service", "url": "http://127.0.0.1:45150", "worktree": "/tmp/devserve test-d3qbzfmk/two"}]}
+
+$ devserve gc
+devserve-devserve_test2019886-two-2c62393b8bcb.service removed
+
+$ devserve ls --json
+{"main_units": [{"app": "devserve_test2019886", "state": "inactive", "unit": "devserve-devserve_test2019886-main.service"}], "previews": []}
+

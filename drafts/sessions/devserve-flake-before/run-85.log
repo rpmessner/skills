@@ -1,0 +1,16 @@
+.......F.............
+======================================================================
+FAIL: test_copied_preview_lifecycle_and_secret_boundary (test_integration.IntegrationTest.test_copied_preview_lifecycle_and_secret_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "skills/devserve/scripts/test_integration.py", line 121, in test_copied_preview_lifecycle_and_secret_boundary
+    self.assertNotIn('PGPASSWORD=<REDACTED>', output)
+AssertionError: 'PGPASSWORD=<REDACTED>' unexpectedly found in global ps output
+
+Captured cause: an unrelated coordinator /usr/bin/zsh command running a foreman database query included a PGPASSWORD assignment. Neither devserve _worker nor either app.py process contained the matched value.
+The full process listing is deliberately removed: it also contained unrelated application credentials. This is the redacted failure evidence, not the raw listing.
+
+----------------------------------------------------------------------
+Ran 21 tests in 26.152s
+
+FAILED (failures=1)
