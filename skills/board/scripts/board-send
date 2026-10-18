@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Best-effort board CLI: same arguments, bounded wait, always exits zero.
+if ! command -v board >/dev/null 2>&1; then
+  echo "warning: board not installed; continuing" >&2
+elif ! command -v timeout >/dev/null 2>&1; then
+  echo "warning: board skipped (timeout unavailable); continuing" >&2
+else
+  timeout --kill-after=1s 5s board "$@"
+  status=$?
+  if [ "$status" -ne 0 ]; then
+    echo "warning: board exited $status; continuing (do not retry refused claims blindly)" >&2
+  fi
+fi
+exit 0

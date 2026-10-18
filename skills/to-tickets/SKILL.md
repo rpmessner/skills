@@ -95,6 +95,8 @@ in `references/beads.md`.
 Avoid file paths and code snippets in tickets — they go stale. Exception: a prototype snippet that pins a
 decision better than prose (state machine, schema, type shape), trimmed and labeled.
 
+After publishing to beads, use the `board` skill to send `epic ticket <draft-slug> --project <project> --beads-epic-id <epic-id>` for the draft from `tight-spec`; skip when there is no draft or only local fallback files.
+
 ## 6. Hand back
 
 Report the epic and ticket ids with titles, and the frontier (`bd ready --parent <epic>`): what can start

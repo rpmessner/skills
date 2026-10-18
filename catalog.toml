@@ -22,6 +22,12 @@ pin = "850d7f2e9f5e55dff7eb00a0a479337fe79eb22f"
 scope = "pstack"
 
 [[skill]]
+name = "board"
+job = "keep-beads-board-current"
+mode = "own"
+from = []
+
+[[skill]]
 name = "tight-spec"
 job = "spec"
 mode = "merge"

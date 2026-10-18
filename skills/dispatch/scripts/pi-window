@@ -1,13 +1,32 @@
 #!/usr/bin/env bash
 # Launch a pi build session in a new tmux window of the current tmux session.
-# usage: pi-window <window-name> <workdir> <brief-file> [pi-args...]
+# usage: pi-window <window-name> <workdir> <brief-file> [--bead ID ... --report PATH] [--] [pi-args...]
 # The brief file's contents become pi's first message; extra args go to pi before it
 # (e.g. `-e <path>` to try an extension for this run only). pi runs under an interactive
 # zsh so ~/.zshrc.local's pi() wrapper (TypeSafe key, Jev flags) applies.
 set -euo pipefail
-[ $# -ge 3 ] || { echo "usage: pi-window <window-name> <workdir> <brief-file> [pi-args...]" >&2; exit 2; }
+[ $# -ge 3 ] || { echo "usage: pi-window <window-name> <workdir> <brief-file> [--bead ID ... --report PATH] [--] [pi-args...]" >&2; exit 2; }
 name=$1 dir=$2 brief=$3
 shift 3
+beads=() report=""
+while [ $# -gt 0 ]; do
+  case $1 in
+    --bead|--report)
+      [ $# -ge 2 ] && [ -n "$2" ] || { echo "$1 needs a value" >&2; exit 2; }
+      if [ "$1" = --bead ]; then beads+=("$2"); else report=$2; fi
+      shift 2 ;;
+    --) shift; break ;;
+    *) break ;;
+  esac
+done
+model=default
+args=("$@")
+for ((i=0; i<${#args[@]}; i++)); do
+  case ${args[i]} in
+    --model|-m) model=${args[i+1]:-default} ;;
+    --model=*) model=${args[i]#--model=} ;;
+  esac
+done
 extra=""
 for a in "$@"; do
   # The launch command is single-quoted for zsh -ic, so an arg holding a quote would break out of it.
@@ -20,7 +39,27 @@ done
 [ -n "${TMUX:-}" ] || { echo "not inside tmux" >&2; exit 2; }
 if tmux list-windows -F '#W' | grep -qx "$name"; then echo "window already exists: $name" >&2; exit 1; fi
 brief=$(realpath "$brief")
-tmux new-window -d -n "$name" -c "$dir" \
-  "zsh -ic 'pi --name \"$name\"$extra \"\$(<\"$brief\")\"; echo; echo \"[pi exited] press enter\"; read'"
+dir=$(realpath "$dir")
+base=$(git -C "$dir" rev-parse HEAD 2>/dev/null) || base=unknown
+branch=$(git -C "$dir" branch --show-current 2>/dev/null) || branch=unknown
+branch=${branch:-detached}
+report=${report:-drafts/sessions/$name.md}
+[[ $report = /* ]] || report="$dir/$report"
+launch="export BOARD_ACTOR=pi BOARD_SESSION=$name; pi --name \"$name\"$extra \"\$(<$(printf '%q' "$brief"))\"; echo; echo \"[pi exited] press enter\"; read"
+launch=${launch//\'/\'\\\'\'}
+tmux new-window -d -n "$name" -c "$dir" "zsh -ic '$launch'"
 tmux set-option -w -t ":$name" automatic-rename off >/dev/null
 echo "launched pi in window '$name' ($dir)"
+if [ "${#beads[@]}" -gt 0 ]; then
+  if ! command -v board >/dev/null 2>&1; then
+    echo "warning: board not installed; continuing" >&2
+  else
+    sender=$(dirname "$(realpath "$0")")/../../board/scripts/board-send
+    for id in "${beads[@]}"; do
+      (cd "$dir"; BOARD_ACTOR=pi BOARD_SESSION="$name" bash "$sender" dispatch "$id" \
+        --window "$name" --harness pi --model "$model" --workdir "$dir" \
+        --branch "$branch" --base "$base" --brief "$brief" --report "$report") || \
+        echo "warning: board adapter unavailable; continuing" >&2
+    done
+  fi
+fi
