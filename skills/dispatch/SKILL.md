@@ -41,6 +41,7 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
 
    ## Done when
    <checkable criteria: gate command and its expected result, tests, evidence>
+   Work until every item above holds. Hand off early only near your context limit (above about 85%), at a clean, green point, with a precise list of what remains; a pure table without its executor is not a stopping point.
 
    ## Report back
    Write <report path>: what changed, evidence, review findings per axis with what you fixed and what you left open, anything else open, final gate output. Then print <MARKER> alone on the last line.
