@@ -4,7 +4,7 @@ Status: approved 2026-10-18. Skills initiative sk-9ro; board draft epic `draft:d
 
 ## Goal
 
-One command, `devserve up`, runs a worktree's app as a preview: a transient systemd user service on a port from the app's range, with its own database copied from the app's main data, logs in journald, and `devserve ls / logs / down` to see, follow and remove previews; build sessions use it for browser checks and foreman's preview button (bb-c2w.14) builds on it.
+One command, `devserve up`, runs a worktree's app as a preview: a transient systemd user service on a port from the app's range, with its own database copied from the app's main data, logs in journald, and `devserve ls / logs / down` to see, follow and remove previews; build sessions use it for browser checks and foreman's preview button (fm-c2w.14) builds on it.
 
 ## Why
 
@@ -16,7 +16,7 @@ The user wants to try branches without tmux windows full of servers and without 
 - A per-repo devserve file (user, Q2).
 - Remote access, TLS, multiple users.
 - Auto-starting previews at login, or restarting them after a reboot (they are transient).
-- foreman's preview button and stage-tied cleanup: that is bb-c2w.14 in the foreman repo, built on this.
+- foreman's preview button and stage-tied cleanup: that is fm-c2w.14 in the foreman repo, built on this.
 
 ## Decisions
 
