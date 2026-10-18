@@ -58,7 +58,7 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
    ```
 
    Read the pane with `tmux capture-pane -p -J -S -200 -t :<window>`.
-   After sending work back to a session that already printed its marker, the old marker is still on screen and `pi-wait` returns at once. Wait instead for the report file's mtime to change and a fresh marker line, or `tmux clear-history -t :<window>` before re-waiting.
+   After sending work back to a session, start a fresh `pi-wait`: it counts only marker lines printed after it starts, so the earlier marker never ends the new wait.
 6. **Close out.**
    1. Read the report file.
    2. Re-run the repo's gate yourself, plus its per-ticket close-out check where it has one (form-engine: `.agents/skills/verify-form-engine/verify closeout <bead-id>` for each closed ticket).
