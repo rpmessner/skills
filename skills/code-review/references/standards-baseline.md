@@ -13,10 +13,21 @@ Two binding rules:
 ## House rule: stateful features are built on a state machine (binding, not a heuristic)
 
 The one exception to "always judgement calls" (user's standing rule; principle `state-machine-skeleton`).
-Scope: workflows (lifecycles, multi-step flows, retries, sync and job pipelines), stateful UI (modes,
-dialogs, wizards, input handling, anything that changes what it accepts), and program business-logic flow:
-the code most likely to be hallucinated or drift, where a declared machine is the app's deterministic
-skeleton. Those must be built on a declared machine: states, events, transitions, guards and effects as a
+Scope: the code most likely to be hallucinated or drift, where a declared machine is the app's
+deterministic skeleton:
+
+- workflows: lifecycles, multi-step flows, retries, sync and job pipelines;
+- stateful UI: modes, dialogs, wizards, input handling, anything that changes what it accepts;
+- program business-logic flow;
+- conversations with external systems: handshakes, connect/disconnect/reconnect, auth and token
+  lifecycles, rate limits, a device or service going away and coming back;
+- resource and process lifecycles: start, running, draining, stopped, and teardown order;
+- agent and session orchestration: dispatch, build, report, review, and any loop that drives agents;
+- game and engine event logic: combat lockdown, encounter phases, what is allowed during a restriction;
+- real-time playback and recording: transport, looping, count-in, actions queued to a beat or bar.
+
+Low-level decoders that are classic machines (MIDI running status, SysEx reassembly) stay judgement
+calls: tight code is fine; suggest a table when one grows branches. Those must be built on a declared machine: states, events, transitions, guards and effects as a
 table or the stack's DSL (Zig kit, `Board.Fsm`, shared `Fsm.lua`), with a pure step that returns effects as
 data and the behaviour hung off it. Report as **Important**:
 
