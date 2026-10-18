@@ -1,6 +1,6 @@
 ---
 name: dispatch
-description: "Coordinator only: launch, watch, steer, and close out pi build sessions in named tmux windows, singly or from `bd ready` across repos."
+description: "Coordinator only: launch, watch, steer, and close out pi build sessions in named tmux windows, singly or from ready tickets across repos."
 ---
 
 <!-- house: own -->
@@ -9,7 +9,11 @@ description: "Coordinator only: launch, watch, steer, and close out pi build ses
 
 You are the coordinator: you plan, brief, verify, and commit. Build work runs in a pi session in its own tmux window, not in your context. Use Claude subagents (Agent tool, pi `subagent`) only when the user asks for them.
 
-Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both need to run inside tmux and target windows of the current session.
+Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). `pi-window` and `pi-wait` need to run inside tmux and target windows of the current session.
+
+Detect the tracker in each repo: `tickets/` means files; otherwise beads. Use the `foreman` skill's
+direct ticket commands for content/status and its best-effort sender only for board events.
+With neither tracker directory, ask for user-approved `foreman adopt`; dispatch does not migrate repos.
 
 ## Dispatch one session
 
@@ -26,7 +30,7 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
    <local AGENTS.md, then the files and prior reports this work builds on>
 
    ## Tickets
-   <bead ids; claim each as you start it; coordinator owns closure after review and any authorized commit>
+   <ticket ids and tracker detected in this repo; start via foreman update <id> --status in_progress for files, bd update <id> --claim for beads, unless coordinator already claimed them; coordinator owns new ticket creation and closure after review and any authorized commit>
 
    ## Skills
    - `tdd` at these seams: <seams agreed in the spec or ticket, or "none: <reason>">
@@ -52,7 +56,7 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
 
    `<base sha>` is `git rev-parse HEAD` in the workdir at dispatch time. Done when every slot is filled and the marker appears only in the last line's instruction.
 3. **Launch:** `bash "$D/pi-window" <window> <workdir> <brief-file> --bead <id> [--bead <id> ...] --report <report-path> -- --model <provider/model> [pi-args...]`; use the `foreman` skill: the script records `dispatch` after launch, best-effort.
-   Use the brief's ticket IDs and report path; pass the chosen model explicitly. It exports `FOREMAN_ACTOR=pi` and `FOREMAN_SESSION=<window>` into pi, captures workdir/branch/base/brief, and refuses duplicate windows. Extra args go to pi (`-e <path>` loads an extension). A workdir pi has not seen (a new worktree) stops at pi's "Trust project folder?" prompt and the session waits there unseen: read the pane right after launch and answer it. Legacy calls without metadata still launch; no IDs means no board dispatch, omitted report defaults to `<workdir>/drafts/sessions/<window>.md`, omitted model records `default` (not a guessed model).
+   Use the brief's ticket IDs and report path; `--bead` is the launcher's legacy flag for either tracker. Pass the chosen model explicitly. It exports `FOREMAN_ACTOR=pi` and `FOREMAN_SESSION=<window>` into pi, captures workdir/branch/base/brief, and refuses duplicate windows. Extra args go to pi (`-e <path>` loads an extension). A workdir pi has not seen (a new worktree) stops at pi's "Trust project folder?" prompt and the session waits there unseen: read the pane right after launch and answer it. Legacy calls without metadata still launch; no IDs means no board dispatch, omitted report defaults to `<workdir>/drafts/sessions/<window>.md`, omitted model records `default` (not a guessed model).
 4. **Wait in the background:** run `$D/pi-wait <window> "<MARKER>" 7200` as a background command, then keep working or return control; do not poll by hand. It matches whole lines only (whitespace-trimmed), so the marker quoted in the brief never counts. Exit codes: 0 `DONE`, 5 `LIMITED` (a provider usage or rate limit stopped the session; the error line follows: tell the user, and once foreman's session-waiting requests exist post one with `--reason usage_limit`; re-wait after the session continues), 6 `BLOCKED` (pi's trust prompt is showing: answer it or trust the parent folder), 7 `IDLE` (nothing on screen changed for `PI_WAIT_IDLE` seconds, default 600, without the marker: the session is probably asking something; read the printed last lines, answer or bring it to the user, then re-wait), 3 `EXITED` (pi quit without the marker: read the pane), 4 timeout (session still running: check the pane, re-wait), 2 window gone.
 5. **Follow up** when the session asks, or when the user adds a decision. Send the text and the Enter as two separate commands, and keep the text to one line:
 
@@ -69,20 +73,26 @@ Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Both
    3. Check each claim against the diff and the evidence. A claim you cannot reproduce is open, not done.
    4. Run `code-review` on the slice's diff against the brief's base sha, axes one after another in your own context; no subagents unless the user asked for them. Use the `foreman` skill to send `changes` with Critical and Important findings before sending work back (step 5); otherwise list findings as open to the user. If returning work, wait for its new report and restart close-out; do not commit or kill that window yet.
    5. Commit, one commit per slice, only when the user has asked for commits; use the `foreman` skill to send `commit --sha <actual-sha>` for the tickets in that commit, only after it succeeds.
-   6. Close verified tickets under the repo's policy, after the board commit event when there is a commit; earlier closure makes the board skip report/review stages.
+   6. Close verified tickets under the repo's policy, after the board commit event when there is a commit; earlier closure makes the board skip report/review stages. Files: direct `foreman close <id> --reason "<evidence>"`, then `foreman check`; beads: `bd close <id> --reason "<evidence>"`. Ticket-file status changes must also be included in an authorized coordinator commit; a board event doesn't save them to git.
    7. Kill the window: `tmux kill-window -t :<window>`.
 
    Done when the gate passes in your own run, every claim is confirmed or listed as open to the user, no Critical review finding is unresolved, and the window is gone.
 
 ## Dispatch from ready
 
-1. List ready work in every repo under `~/dev` that has a `.beads` dir:
+1. List ready work across main checkouts under `~/dev`:
 
    ```bash
-   fd -H -I -t d -g .beads ~/dev --max-depth 5 -E node_modules -E deps -E _build |
-     while read -r b; do r=$(dirname "$b"); echo "== ${r#$HOME/dev/}"; (cd "$r" && bd ready); done
+   python3 "$D/ready-repos.py" ~/dev
    ```
 
-   A repo whose Dolt server is unreachable: report it, do not start servers.
+   It discovers repo-root `tickets/` or `.beads/` directories to depth 5, excluding dependency/build
+   trees and checkouts whose `.git` is a file (linked worktrees). Files take precedence:
+   `foreman ready --json` (uncapped); beads: `bd ready --json --limit 0` (all ready tickets).
+   Output groups the
+   unchanged ticket records by repo and tracker. A files-only set needs no `bd` on PATH.
+   Each repo has a 30-second limit. Failed reads are reported on stderr, healthy repos still appear,
+   and the script exits 1 for an incomplete scan. Report failures; do not treat them as empty frontiers,
+   start Dolt servers, or fall back to beads when a files command fails.
 2. Propose a table to the user: ticket, repo, window name, why it can run now. Group tickets that share files into one window. Never put two writers in the same repo working tree at once. Leave out epics, tickets that need the user live (in-game probes, logins), and tickets blocked on a decision.
 3. On approval, dispatch each row as above, one brief per window.
