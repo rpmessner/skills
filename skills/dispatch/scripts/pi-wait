@@ -8,11 +8,15 @@
 # already printed its marker waits for the next one.
 # A provider limit is an "Error:" line naming a usage limit, extra usage, a rate limit or 429
 # (e.g. "Error: Codex error: The usage limit has been reached"): pi stops and sits idle there.
-# exit 0 DONE (marker line), 5 LIMITED (prints the error line), 3 EXITED ("[pi exited] press
-#      enter" line), 4 timeout, 2 window gone, 1 usage.
+# A session can also stop and wait unseen: at pi's "Trust project folder?" prompt (BLOCKED), or
+# asking a question with nothing on screen changing for PI_WAIT_IDLE seconds (default 600;
+# pi's spinner and counters move while it works) (IDLE, with the last screen lines).
+# exit 0 DONE (marker line), 5 LIMITED (prints the error line), 6 BLOCKED (prints the prompt),
+#      7 IDLE (prints the last lines), 3 EXITED ("[pi exited] press enter" line), 4 timeout,
+#      2 window gone, 1 usage.
 set -uo pipefail
 [ $# -ge 2 ] && [ $# -le 3 ] || { echo "usage: pi-wait <window> <marker> [timeout-seconds]" >&2; exit 1; }
-win=$1 marker=$2 timeout=${3:-3600} interval=${PI_WAIT_INTERVAL:-5}
+win=$1 marker=$2 timeout=${3:-3600} interval=${PI_WAIT_INTERVAL:-5} idle=${PI_WAIT_IDLE:-600}
 [[ $timeout =~ ^[0-9]+$ ]] || { echo "timeout must be whole seconds: $timeout" >&2; exit 1; }
 [ -n "$(printf '%s' "$marker" | tr -d '[:space:]')" ] || { echo "marker must not be blank" >&2; exit 1; }
 
@@ -26,16 +30,31 @@ count() {
     END { print d + 0, e + 0, l + 0, last }'
 }
 
+# The visible screen only (no scrollback): what the session shows right now.
+screen() { tmux capture-pane -p -J -t ":$win" 2>/dev/null; }
+# Milliseconds since the epoch (bash 5 EPOCHREALTIME), so short idle limits are exact.
+now_ms() { local t=${EPOCHREALTIME/./}; echo "${t:0:-3}"; }
+
 deadline=$((SECONDS + timeout))
 tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win" || { echo "GONE"; exit 2; }
 read -r base_done base_exit base_limit _ < <(count)
+last_screen=$(screen | md5sum) last_change=$(now_ms)
 while :; do
   tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win" || { echo "GONE"; exit 2; }
   read -r now_done now_exit now_limit limit_line < <(count)
-  # DONE beats LIMITED beats EXITED: a session that finished is done whatever it printed after.
+  # DONE beats LIMITED beats EXITED beats BLOCKED and IDLE: a finished session is done whatever follows.
   [ "$now_done" -gt "$base_done" ] && { echo DONE; exit 0; }
   [ "$now_limit" -gt "$base_limit" ] && { echo LIMITED; echo "$limit_line"; exit 5; }
   [ "$now_exit" -gt "$base_exit" ] && { echo EXITED; exit 3; }
+  shown=$(screen)
+  if trust=$(printf '%s\n' "$shown" | grep -m1 'Trust project folder?'); then
+    echo BLOCKED; echo "$trust" | sed -E 's/^[[:space:]]+//'; exit 6
+  fi
+  sum=$(printf '%s' "$shown" | md5sum)
+  [ "$sum" != "$last_screen" ] && { last_screen=$sum; last_change=$(now_ms); }
+  if [ $(( $(now_ms) - last_change )) -ge $((idle * 1000)) ]; then
+    echo IDLE; printf '%s\n' "$shown" | sed -E 's/^[[:space:]]+|[[:space:]]+$//g' | grep -v '^$' | grep -v '^[─━-]*$' | tail -6; exit 7
+  fi
   [ "$SECONDS" -ge "$deadline" ] && { echo "TIMEOUT"; exit 4; }
   sleep "$interval"
 done

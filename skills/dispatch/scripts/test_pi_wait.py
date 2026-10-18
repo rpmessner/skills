@@ -28,7 +28,8 @@ elif sys.argv[1] == "capture-pane":
     sys.stdout.write(open({str(self.pane)!r}).read())
 ''')
         tmux.chmod(0o755)
-        self.env = dict(os.environ, PATH=f"{bin_dir}:/usr/bin:/bin", PI_WAIT_INTERVAL="0.1")
+        self.env = dict(os.environ, PATH=f"{bin_dir}:/usr/bin:/bin", PI_WAIT_INTERVAL="0.1",
+                        PI_WAIT_IDLE="600")
 
     def wait(self, *lines, before=()):
         self.write(*before)
@@ -67,6 +68,35 @@ elif sys.argv[1] == "capture-pane":
 
     def test_done_beats_limited(self):
         self.assertEqual(self.wait(CODEX, "BUILD DONE"), (0, ["DONE"]))
+
+    def test_trust_prompt_exits_blocked(self):
+        code, out = self.wait(" Trust project folder?", " /home/me/dev/new-worktree", " → Trust")
+        self.assertEqual(code, 6)
+        self.assertEqual(out[0], "BLOCKED")
+        self.assertIn("Trust project folder?", out[1])
+
+    def test_screen_unchanged_for_the_idle_limit_exits_idle_with_last_lines(self):
+        self.env["PI_WAIT_IDLE"] = "1"
+        code, out = self.wait("working", "One gate remains: may I create a fixture commit?")
+        self.assertEqual(code, 7)
+        self.assertEqual(out[0], "IDLE")
+        self.assertIn("One gate remains: may I create a fixture commit?", out)
+
+    def test_a_changing_screen_is_not_idle(self):
+        self.env["PI_WAIT_IDLE"] = "1"
+        self.write("start")
+        proc = subprocess.Popen(["bash", str(SCRIPT), "build", "BUILD DONE", "10"], env=self.env,
+                                stdout=subprocess.PIPE, text=True)
+        for i in range(12):  # keep printing for about 1.2 s, longer than the idle limit
+            time.sleep(0.1)
+            self.write(f"step {i}")
+        self.write("BUILD DONE")
+        out, _ = proc.communicate(timeout=10)
+        self.assertEqual((proc.returncode, out.strip().splitlines()), (0, ["DONE"]))
+
+    def test_done_beats_idle(self):
+        self.env["PI_WAIT_IDLE"] = "1"
+        self.assertEqual(self.wait("BUILD DONE"), (0, ["DONE"]))
 
 
 if __name__ == "__main__":
