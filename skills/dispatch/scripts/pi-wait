@@ -6,31 +6,35 @@
 # the brief or the launch command never matches. Only marker lines printed after
 # pi-wait starts count, so re-waiting after sending work back to a session that
 # already printed its marker waits for the next one.
-# exit 0 DONE (marker line), 3 EXITED ("[pi exited] press enter" line), 4 timeout,
-#      2 window gone, 1 usage.
+# A provider limit is an "Error:" line naming a usage limit, extra usage, a rate limit or 429
+# (e.g. "Error: Codex error: The usage limit has been reached"): pi stops and sits idle there.
+# exit 0 DONE (marker line), 5 LIMITED (prints the error line), 3 EXITED ("[pi exited] press
+#      enter" line), 4 timeout, 2 window gone, 1 usage.
 set -uo pipefail
 [ $# -ge 2 ] && [ $# -le 3 ] || { echo "usage: pi-wait <window> <marker> [timeout-seconds]" >&2; exit 1; }
 win=$1 marker=$2 timeout=${3:-3600} interval=${PI_WAIT_INTERVAL:-5}
 [[ $timeout =~ ^[0-9]+$ ]] || { echo "timeout must be whole seconds: $timeout" >&2; exit 1; }
 [ -n "$(printf '%s' "$marker" | tr -d '[:space:]')" ] || { echo "marker must not be blank" >&2; exit 1; }
 
-# Prints "<marker lines> <exit lines>" counted over the whole scrollback.
+# Prints "<marker lines> <exit lines> <limit lines> <last limit line>" over the whole scrollback.
 count() {
   tmux capture-pane -p -J -S - -t ":$win" 2>/dev/null | M="$marker" awk '
     { gsub(/^[[:space:]]+|[[:space:]]+$/, "") }
     $0 == ENVIRON["M"] { d++ }
     $0 == "[pi exited] press enter" { e++ }
-    END { print d + 0, e + 0 }'
+    /^Error:/ && tolower($0) ~ /usage limit|extra usage|rate limit|429/ { l++; last = $0 }
+    END { print d + 0, e + 0, l + 0, last }'
 }
 
 deadline=$((SECONDS + timeout))
 tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win" || { echo "GONE"; exit 2; }
-read -r base_done base_exit < <(count)
+read -r base_done base_exit base_limit _ < <(count)
 while :; do
   tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win" || { echo "GONE"; exit 2; }
-  read -r now_done now_exit < <(count)
-  # DONE beats EXITED: a session that finished and then quit is done.
+  read -r now_done now_exit now_limit limit_line < <(count)
+  # DONE beats LIMITED beats EXITED: a session that finished is done whatever it printed after.
   [ "$now_done" -gt "$base_done" ] && { echo DONE; exit 0; }
+  [ "$now_limit" -gt "$base_limit" ] && { echo LIMITED; echo "$limit_line"; exit 5; }
   [ "$now_exit" -gt "$base_exit" ] && { echo EXITED; exit 3; }
   [ "$SECONDS" -ge "$deadline" ] && { echo "TIMEOUT"; exit 4; }
   sleep "$interval"
