@@ -2,7 +2,10 @@
 
 <!-- house: adapt; from: mattpocock:skills/engineering/to-tickets@49dd158 (templates), beads CLI -->
 
-## Beads
+## Beads (`.beads/` with no `tickets/`)
+
+For `tickets/` repos use `files.md` instead. Onboarding or migration is a user-approved
+`foreman adopt`, not part of this recipe.
 
 `--deps <id>` on `bd create` means "the new ticket is blocked by `<id>`". Comma-separate several.
 Use `--silent` to capture ids, and `--body-file -` with a heredoc for multi-line descriptions.
@@ -40,26 +43,3 @@ bd ready --parent "$EPIC"    # the frontier: what can start now
 - Type: default `task`; use `-t feature` or `-t bug` when that is what it is.
 - Edge added late or wrong: `bd dep add <blocked> <blocker>` / `bd dep remove <blocked> <blocker>`.
 - Don't add triage labels: `bd ready` already is the agent-grabbable frontier.
-
-## Local fallback (no `.beads/`)
-
-`.scratch/<feature-slug>/issues/NN-<slug>.md`, one file per ticket, numbered from `01` in dependency
-order. Put the approved spec in `.scratch/<feature-slug>/spec.md`.
-
-```markdown
-# <NN>: <Ticket title>
-
-**What to build:** the end-to-end behavior this ticket makes work, from the user's perspective, not a
-layer-by-layer implementation list.
-
-**Blocked by:** the numbers/titles of the tickets that gate this one, or "None (can start immediately)".
-
-**Interfaces:** (only if it hands a named contract to another ticket) Produces / Consumes.
-
-**Status:** open
-
-- [ ] Acceptance criterion 1
-- [ ] Acceptance criterion 2
-```
-
-The frontier is every open ticket whose blockers are all done; for a linear chain, top to bottom.

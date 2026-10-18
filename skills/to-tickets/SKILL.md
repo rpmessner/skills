@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: "Break an approved spec, plan, or conversation into tracer-bullet tickets with blocking edges and acceptance criteria, published to beads under an epic. Use for /to-tickets or after tight-spec approval."
+description: "Break an approved spec, plan, or conversation into tracer-bullet tickets with blocking edges and acceptance criteria, published under an epic in the repo's tracker. Use for /to-tickets or after tight-spec approval."
 disable-model-invocation: true
 ---
 
@@ -9,16 +9,18 @@ disable-model-invocation: true
 # To Tickets
 
 Break a spec, plan, or conversation into **tickets**: tracer-bullet vertical slices, each declaring the
-tickets that **block** it, published to beads (`bd`). Then give a short rundown and stop for pushback.
+tickets that **block** it, published to the repo's tracker. Then give a short rundown and stop for pushback.
 This skill plans; it never starts implementing.
 
 ## 1. Gather context
 
-Work from the conversation. If the user passes a reference (a bead id, a spec path), read its full body,
-comments, and children (`bd show <id>`, `bd list --parent <id>`).
+Detect the tracker in this repo: `tickets/` means ticket files (even if `.beads/` also exists);
+otherwise use beads. With neither directory, ask the user to onboard with `foreman adopt`; don't
+initialize or migrate a repo as part of publishing. Use the `foreman` skill for tracker commands.
 
-Check the tracker: if the repo has a `.beads/` directory, publish to beads. Otherwise fall back to local
-files (step 5); don't run `bd init` without asking.
+Work from the conversation. If the user passes a reference (a ticket id, a spec path), read its full
+body, notes/comments, and children: files use `foreman show <id> --json` and `foreman tree <id> --json`;
+beads use `bd show <id>` and `bd list --parent <id>`.
 
 ## 2. Explore the codebase
 
@@ -80,24 +82,27 @@ Iterate until the user approves. Do not publish before approval.
 
 ## 5. Publish
 
-Publish in dependency order (blockers first) so each `--deps` names a real id. Commands and templates are
-in `references/beads.md`.
+Publish from the main checkout in dependency order (blockers first), so each blocker names a real id.
+Build sessions hand ticket proposals to the coordinator rather than allocating ids in worktrees.
 
-- **Epic.** If the source is an existing bead, it is the parent: don't close or rewrite it. Otherwise
-  create an epic whose description is the approved spec (Goal, Non-goals, Acceptance checks, Ask-first
+- **Epic.** If the source is an existing ticket, it is the parent: don't close or rewrite it. Otherwise
+  create an epic whose body is the approved spec (Goal, Non-goals, Acceptance checks, Ask-first
   boundaries) so every ticket inherits it from one place.
-- **Tickets.** One `bd create` per ticket with `--parent <epic>`, `--deps <blocker-ids>`, a description
-  (what to build, from the user's perspective, plus Interfaces if any), and `--acceptance` (a checklist).
-- **No `.beads/`** — write one file per ticket under `.scratch/<feature-slug>/issues/NN-<slug>.md`,
-  numbered from `01` in dependency order, using the local template in `references/beads.md`. Never a
-  single combined file.
+- **Files (`tickets/`).** Follow `references/files.md`: one `foreman new` per ticket with `--parent`
+  and `--blocked-by`, and a body with What to build, Interfaces if any, and Acceptance checkboxes.
+  Run `foreman check`; verify the created ids and edges before handing the files to the coordinator
+  for an authorized commit. Ticket commands run directly, never through the best-effort board sender.
+- **Beads (`.beads/`, no `tickets/`).** Follow `references/beads.md`: one `bd create` per ticket with
+  `--parent`, `--deps`, description and acceptance checklist.
 
 Avoid file paths and code snippets in tickets — they go stale. Exception: a prototype snippet that pins a
 decision better than prose (state machine, schema, type shape), trimmed and labeled.
 
-After publishing to beads, use the `foreman` skill to send `epic ticket <draft-slug> --project <project> --beads-epic-id <epic-id>` for the draft from `tight-spec`; skip when there is no draft or only local fallback files.
+After publishing in either tracker, use the `foreman` skill to send `epic ticket <draft-slug> --project <project> --beads-epic-id <epic-id>` for the draft from `tight-spec`; skip when there is no draft. The legacy flag also accepts file-ticket epic ids.
 
 ## 6. Hand back
 
-Report the epic and ticket ids with titles, and the frontier (`bd ready --parent <epic>`): what can start
-now, and what could run in parallel. Then stop. Implementation starts only when the user says so.
+Report the epic and ticket ids with titles, and the frontier: files use
+`foreman ready --json | jq --arg epic "$EPIC" '[.[] | select(.parent == $epic)]'`;
+beads use `bd ready --parent <epic>`. Say what can start now and what could run in parallel.
+Then stop. Implementation starts only when the user says so.

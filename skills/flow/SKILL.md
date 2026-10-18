@@ -14,9 +14,9 @@ Skills marked * are user-invoked. When one is due, name it to the user (`/tight-
 ## New nontrivial work
 
 1. `tight-spec`*: goal, non-goals, acceptance checks. Stop for user approval.
-2. `to-tickets`*: approved spec → beads epic and vertical-slice tickets with blocking edges.
+2. `to-tickets`*: approved spec → tracker epic and vertical-slice tickets with blocking edges.
 3. Rundown: your understanding in a few lines. Stop for user pushback.
-4. `implement`*: work the beads frontier ticket by ticket. `tdd` at seams, `verify-before-claiming` before any done-claim, `code-review` per ticket.
+4. `implement`*: work the repo's ticket frontier ticket by ticket. `tdd` at seams, `verify-before-claiming` before any done-claim, `code-review` per ticket.
 
 Too big or too foggy for one session: `wayfinder`* first; when its map clears, enter at step 1.
 
@@ -44,5 +44,6 @@ Setup and one-off skills (`setup-pre-commit`, `git-guardrails-claude-code`, `mig
 ## Operating model
 
 - A coordinator Claude Code session plans and dispatches build sessions as pi agents in named tmux windows → `dispatch` (coordinator only). Each build session reports where its brief says.
+- Detect the tracker per repo: `tickets/` → direct `foreman` ticket commands; otherwise `.beads/` → `bd` until user-approved `foreman adopt`. With neither, ask to onboard. The `foreman` skill separates ticket content from best-effort board events.
 - At coordinator close-out, use `foreman` through `dispatch`: `review` before checking, `changes` (`request_changes`) when returning findings, `commit` after an authorized commit; board warnings never block the workflow.
 - Claude subagents (Agent tool; pi `subagent`) only when the user asks for them. This overrides any skill that says to dispatch or fan out subagents: run that work sequentially in context instead, or ask first.

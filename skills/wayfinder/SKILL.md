@@ -4,7 +4,7 @@ description: Plan a huge chunk of work (more than one agent session can hold) as
 disable-model-invocation: true
 ---
 
-<!-- house: adapt; from: mattpocock:skills/engineering/wayfinder@49dd158. Edits: /setup-matt-pocock-skills tracker lookup -> beads (`bd`) note plus a "Beads operations" section (verified in a scratch repo, bd 1.1.0); research branches stay local (agents never push); "call the Skill tool with X" -> run the `X` skill; map invoked by bead id. -->
+<!-- house: adapt; from: mattpocock:skills/engineering/wayfinder@49dd158. Edits: per-repo tracker operations; research branches stay local (agents never push); "call the Skill tool with X" -> run the `X` skill; map invoked by ticket id. -->
 
 A loose idea has arrived, too big for one agent session, and wrapped in fog: the way from here to the **destination** isn't visible yet. Wayfinding is about finding that way, not charging at the destination. This skill charts the way as a **shared map** on the repo's issue tracker, then works its **decision tickets** (questions whose resolution is a decision, not slices of a build to execute) one at a time until the route is clear.
 
@@ -24,17 +24,28 @@ The map is a single issue on this repo's issue tracker, labelled `wayfinder:map`
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place, its ticket, so the map never restates it, only gists it and links.
 
-The tracker is beads (`bd`); domain docs follow the repo's AGENTS.md. [Beads operations](#beads-operations) gives the command for each map operation. If the repo has no `.beads/`, ask before running `bd init`.
+Detect the tracker per repo: `tickets/` means files (even with `.beads/` present); otherwise beads.
+Domain docs follow the repo's AGENTS.md. With neither directory, ask for user-approved `foreman adopt`.
+Use the `foreman` skill for direct ticket commands, not the best-effort board sender. New tickets are
+created by the coordinator in the main checkout; build sessions report proposals instead.
 
-### Beads operations
+### Tracker operations
 
-- **Map**: `bd create "<effort>" -t epic -l wayfinder:map --body-file -` (the map body on stdin).
-- **Ticket**: `bd create "<question title>" --parent <map> -t decision --no-inherit-labels -l wayfinder:<type> --body-file -`. Without `--no-inherit-labels`, the child inherits `wayfinder:map`.
-- **Blocking**: `bd dep add <blocked> <blocker>`, in the second pass once every id exists.
-- **Frontier**: `bd ready --parent <map> --unassigned`.
-- **Claim**: `bd update <id> --claim`, the session's first write.
-- **Resolve**: `bd comments add <id> "<answer>"`, then `bd close <id> --reason "<gist>"`, then rewrite the map body with `bd update <map> --body-file -` to append the Decisions-so-far line.
-- **Out of scope**: `bd close <id> --reason "out of scope: <why>"`, plus the line in the map's Out of scope.
+| Operation | Files (`tickets/`) | Beads (`.beads/`, no `tickets/`) |
+| --- | --- | --- |
+| Load map / children | `foreman show <map> --json` / `foreman tree <map> --json` | `bd show <map>` / `bd list --parent <map>` |
+| Map | `foreman new "<effort>" --type epic --labels wayfinder:map --body "<map body>"` | `bd create "<effort>" -t epic -l wayfinder:map --body-file -` |
+| Ticket | `foreman new "<question>" --parent <map> --type decision --labels wayfinder:<type> --body "<question body>"` | `bd create "<question>" --parent <map> -t decision --no-inherit-labels -l wayfinder:<type> --body-file -` |
+| Blocking (second pass) | `foreman dep add <blocked> <blocker>` | `bd dep add <blocked> <blocker>` |
+| Frontier | `foreman ready --json \| jq --arg map "$MAP" '[.[] \| select(.parent == $map)]'` | `bd ready --parent <map> --unassigned` |
+| Claim | `foreman update <id> --status in_progress` | `bd update <id> --claim` |
+| Resolution | `foreman note <id> "<answer>"`, then `foreman close <id> --reason "<gist>"` | `bd comments add <id> "<answer>"`, then `bd close <id> --reason "<gist>"` |
+| Rewrite map | `foreman update <map> --body "<full updated body>"` | `bd update <map> --body-file -` |
+
+On files, `--body` takes text, not a path. Read the current map before rewriting so existing Notes
+and decisions survive; inspect the result and run `foreman check` after writes. Files don't inherit
+labels; beads children need `--no-inherit-labels` to avoid inheriting `wayfinder:map`.
+For out-of-scope closure, use reason `out of scope: <why>` and update the map's Out of scope.
 
 ### The map body
 
@@ -76,11 +87,13 @@ Each ticket is a **child issue** of the map; the tracker's issue id is its ident
 
 Each ticket carries a `wayfinder:<type>` label, one of `research`, `prototype`, `grilling`, `task` (see [Ticket Types](#ticket-types)). `wayfinder:` labels are the only labels a map and its tickets carry, never a triage label like `ready-for-agent`: they are decisions, not implementation work.
 
-A session **claims** a ticket by assigning it to the dev driving the map, **first**, before any work, so concurrent sessions skip it. That assignee _is_ the claim: an open, unassigned ticket is unclaimed.
+A session **claims** a ticket **first**, before any work: files set `in_progress` (no assignee field);
+beads assign it to the dev driving the map. Ready queries then skip it. Coordinate writers in the
+main checkout; a status write is not a cross-worktree lock.
 
 Blocking uses the tracker's **native** dependency relationship: essential because it renders the frontier _visually_ in the tracker's own UI, so the human sees what's takeable without opening the map. Only a tracker that lacks native blocking falls back to a body convention. A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children, the edge of the known.
 
-The answer isn't part of the body; it's recorded on resolution (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the issue, not pasted in.
+The answer isn't part of the question; it's recorded in Notes (files) or a comment (beads) on resolution (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the issue, not pasted in.
 
 ## Ticket Types
 
@@ -129,12 +142,12 @@ User invokes with a loose idea.
 
 ### Work through the map
 
-User invokes with a map (bead id). A ticket is **optional**: without one, you pick the next decision, not the user.
+User invokes with a map (ticket id). A ticket is **optional**: without one, you pick the next decision, not the user.
 
 1. Load the **map**: the low-res view, not every ticket body.
-2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: assign it to yourself before any work.
+2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it** using the detected tracker's operation before any work.
 3. Resolve it as the type its `wayfinder:<type>` label names (see [Ticket Types](#ticket-types)). Read the label, not just the body: the body never states the type. **Zoom as needed**: fetch the full body of any related or closed ticket on demand; run whichever skills the `## Notes` block names. If in doubt, run the `grilling` and `domain-modeling` skills.
-4. Record the resolution: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
-5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals that a ticket (this one or another) sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
+4. Record the resolution: post the answer as a **resolution note/comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
+5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals that a ticket (this one or another) sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or close those tickets with the reason.
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
