@@ -1,4 +1,4 @@
-<!-- house: merge; from: mattpocock:skills/engineering/code-review@49dd158, pstack:pstack/agents/comment-sicko.md@850d7f2 -->
+<!-- house: merge; from: mattpocock:skills/engineering/code-review@49dd158, pstack:pstack/agents/comment-sicko.md@850d7f2  ; house edit 2026-10-17: binding state-machine rule -->
 
 # Standards baseline
 
@@ -9,6 +9,23 @@ Two binding rules:
 - **The repo overrides.** A documented repo standard wins; where it endorses something below, suppress the flag.
 - **Always judgement calls.** Each item is a labelled heuristic ("possible Feature Envy"), never a hard
   violation. Skip anything tooling already enforces.
+
+## House rule: stateful features are built on a state machine (binding, not a heuristic)
+
+The one exception to "always judgement calls" (user's standing rule; principle `state-machine-skeleton`).
+Any feature with nontrivial state mechanics (modes, lifecycles, multi-step flows, retries, input handling,
+UI that changes what it accepts) must be built on a declared machine: states, events, transitions, guards
+and effects as a table or the stack's DSL (Zig kit, `Board.Fsm`, shared `Fsm.lua`), with a pure step that
+returns effects as data and the behaviour hung off it. Report as **Important**:
+
+- state tracked as booleans, status strings or nullable fields that a `case`/`if` cascade interprets, where
+  a machine would declare it;
+- a transition decided outside the machine (code that sets the state directly, or skips `step`);
+- a new stateful feature with no machine, or a machine whose table misses a pair the code handles;
+- effects performed inside the step instead of returned as data.
+
+Not a finding: genuinely stateless code, a single flag with no transitions, or data that changes no handled
+event (show it as data, per the principle).
 
 ## Smells (Fowler, *Refactoring* ch. 3): what it is → fix
 
