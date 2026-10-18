@@ -24,8 +24,7 @@ are fine; keeping a spike is a new request that comes back through this gate.
   project's vocabulary in every question and in the spec; respect existing ADRs.
 - If the request already holds everything that matters ("make the icon cornflower blue"), skip this skill:
   do it and say what you did.
-- If the conversation already settled the decisions, skip the interview: synthesize the spec (step 4) and
-  confirm only what is genuinely open.
+- If the conversation already settled the decisions, size it (step 2), send the project draft's start-spec event (step 3), then synthesize (step 4); confirm only what is genuinely open.
 
 ## 2. Restate and size
 
@@ -39,7 +38,11 @@ words (the user can override):
 
 If it grows mid-interview, stop, say so, and step up a size.
 
+For a project only, use the `board` skill to create/reuse a draft epic (slug, configured project, spec path); keep that identity for the handoff, even if the board is unavailable.
+
 ## 3. Interview
+
+Use the `board` skill to send `epic spec` (`start_spec`) for the project draft as the interview starts; if skipping the interview, send it before synthesizing step 4.
 
 **Facts are your job; decisions are the user's.** Never ask the user something you can look up (code,
 config, docs, tool output). Explore yourself, or dispatch a read-only subagent for wide searches; ask
@@ -112,7 +115,7 @@ highest one possible; fewest seams wins. Confirm the seams with the user.>
 <choices deliberately not decided here>
 ```
 
-For a project-size spec, run the builder check in `references/builder-check.md` before handing it over.
+For a project-size spec, save the spec at the draft's spec path and run the builder check in `references/builder-check.md` before handing it over.
 
 ## 5. Gate and hand off
 
@@ -126,3 +129,5 @@ Before asking for approval, you must be able to answer:
 Present the spec with a short list of the calls you made. "Sounds good" to an idea is not approval of a
 spec you haven't shown. Once approved: for a project, ask the user to run `/to-tickets <spec>` (it is user-invoked, so the
 Skill tool cannot start it); for a small change, proceed through the normal workflow.
+
+On project-spec approval, use the `board` skill to send `epic approve` (`approve_spec`) with the saved spec path; pass the draft slug, project and path to `to-tickets`.
