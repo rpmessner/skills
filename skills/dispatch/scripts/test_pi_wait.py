@@ -70,10 +70,15 @@ elif sys.argv[1] == "capture-pane":
         self.assertEqual(self.wait(CODEX, "BUILD DONE"), (0, ["DONE"]))
 
     def test_trust_prompt_exits_blocked(self):
-        code, out = self.wait(" Trust project folder?", " /home/me/dev/new-worktree", " → Trust")
+        code, out = self.wait(" Trust project folder?", " /home/me/dev/new-worktree", " → Trust",
+                              "   Trust parent folder (/home/me/dev)")
         self.assertEqual(code, 6)
         self.assertEqual(out[0], "BLOCKED")
         self.assertIn("Trust project folder?", out[1])
+
+    def test_the_prompt_quoted_in_text_is_not_blocked(self):
+        code, out = self.wait('stops at pi\'s "Trust project folder?" prompt and waits', "BUILD DONE")
+        self.assertEqual((code, out), (0, ["DONE"]))
 
     def test_screen_unchanged_for_the_idle_limit_exits_idle_with_last_lines(self):
         self.env["PI_WAIT_IDLE"] = "1"

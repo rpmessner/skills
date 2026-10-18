@@ -47,8 +47,11 @@ while :; do
   [ "$now_limit" -gt "$base_limit" ] && { echo LIMITED; echo "$limit_line"; exit 5; }
   [ "$now_exit" -gt "$base_exit" ] && { echo EXITED; exit 3; }
   shown=$(screen)
-  if trust=$(printf '%s\n' "$shown" | grep -m1 'Trust project folder?'); then
-    echo BLOCKED; echo "$trust" | sed -E 's/^[[:space:]]+//'; exit 6
+  # pi's prompt: a line that is exactly the question, with its "Trust parent folder" option
+  # showing; the phrase quoted inside text the session is reading does not count.
+  if printf '%s\n' "$shown" | grep -qxE '[[:space:]]*Trust project folder\?[[:space:]]*' &&
+     printf '%s\n' "$shown" | grep -qE '^[[:space:]→]*Trust parent folder'; then
+    echo BLOCKED; echo "Trust project folder?"; exit 6
   fi
   sum=$(printf '%s' "$shown" | md5sum)
   [ "$sum" != "$last_screen" ] && { last_screen=$sum; last_change=$(now_ms); }
