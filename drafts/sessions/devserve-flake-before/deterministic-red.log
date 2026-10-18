@@ -1,0 +1,4 @@
+FAIL: test_copied_preview_lifecycle_and_secret_boundary (test_integration.IntegrationTest.test_copied_preview_lifecycle_and_secret_boundary)
+Ran 1 test in 2.820s
+FAILED (failures=1)
+Unrelated canary process deterministically trips the global argv scan. Raw process dump discarded.
