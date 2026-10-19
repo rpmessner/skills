@@ -2,7 +2,7 @@
 id: sk-fkb
 title: "dispatch: build sessions as panes in the epic coordinator's window"
 type: feature
-status: in_progress
+status: closed
 priority: 2
 parent: null
 blocked_by: []
@@ -11,8 +11,8 @@ supersedes: []
 discovered_from: null
 labels: []
 created: 2026-10-19
-closed: null
-close_reason: null
+closed: 2026-10-19
+close_reason: "merged e2f09629b0c4a9b95f19e0b543cfee6d0270aec7; 50 dispatch tests + scratch two-pane tmux probe pass; check.py clean"
 ---
 
 Epic coordinators (foreman fm-3c3.8) put their pi build sessions in new panes of their own window instead of new windows, so an epic's work sits together. The main coordinator keeps one window per build.
