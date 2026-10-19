@@ -2,7 +2,7 @@
 id: sk-dnl
 title: "orient skill: coordinator start-of-session assessment"
 type: feature
-status: in_progress
+status: closed
 priority: 2
 parent: null
 blocked_by: []
@@ -11,8 +11,8 @@ supersedes: []
 discovered_from: null
 labels: []
 created: 2026-10-19
-closed: null
-close_reason: null
+closed: 2026-10-19
+close_reason: "orient skill merged (ed4c4b5e3da83a1568f7abd8303cf1b086a6c036); gate green; live and foreman-down transcripts in drafts/sessions/sk-orient-evidence"
 ---
 
 A house skill the coordinator runs at the start of a session (foreman's `foreman coordinator` sends it as the orient prompt, fm-3c3.6; the user can also run `/orient`).
