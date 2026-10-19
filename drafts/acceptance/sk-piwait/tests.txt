@@ -1,0 +1,18 @@
+✔ settled question posts once and resumed activity clears through the CLI (48.348085ms)
+✔ confirmation stays pending during sibling tool activity and clears when answered (45.383702ms)
+✔ input dialogs map to input without leaking question text (43.602411ms)
+✔ provider limit posts only after settlement and clears on the next turn (44.013199ms)
+✔ shutdown clears pending waits (44.600831ms)
+✔ ordinary completion, aborted runs and recovered limits do not post waits (0.319093ms)
+✔ untracked sessions are inert and duplicate ticket IDs are delivered only once (94.315535ms)
+✔ missing foreman warns once and never rejects a pi handler (112.936203ms)
+✔ hung CLI cannot block handlers and is killed within the bound (5012.110725ms)
+✔ CLI remains bounded even when pi exits during delivery (6050.984724ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11502.284082

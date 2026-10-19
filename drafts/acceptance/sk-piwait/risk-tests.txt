@@ -1,0 +1,11 @@
+✔ missing foreman warns once and never rejects a pi handler (117.582122ms)
+✔ hung CLI cannot block handlers and is killed within the bound (5014.502268ms)
+✔ CLI remains bounded even when pi exits during delivery (6055.740803ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11267.264361

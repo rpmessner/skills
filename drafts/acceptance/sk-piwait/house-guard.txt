@@ -1,0 +1,17 @@
+ok   block git push origin main
+ok   block cd /tmp && git push
+ok   block git reset --hard HEAD~1
+ok   block git clean -fdx
+ok   block git branch -D topic
+ok   block rm -rf build
+ok   allow /usr/bin/rm -f build/x.o
+ok   allow git status && ls -la
+ok   allow cd /tmp/house-guard-O12irO && git commit -m ok
+ok   block cd /tmp/house-guard-O12irO && git commit -m key
+ok   block git -C /tmp/house-guard-O12irO commit -m key
+ok   block git commit -m key
+ok   block cd /tmp/house-guard-O12irO && git commit -m secret
+ok   block cd /tmp/house-guard-O12irO && git commit -m ssh
+ok   block cd /tmp/house-guard-O12irO && git commit -m winpath
+ok   block ls with hooks missing (fail closed)
+all ok

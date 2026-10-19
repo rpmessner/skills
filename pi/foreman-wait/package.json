@@ -1,0 +1,11 @@
+{
+  "name": "foreman-wait",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Best-effort waiting notifications from pi build sessions to foreman.",
+  "keywords": ["pi-package"],
+  "type": "module",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
