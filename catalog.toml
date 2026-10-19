@@ -447,6 +447,12 @@ mode = "own"
 # --- sk-81s.9: coordinator dispatch ---
 
 [[skill]]
+name = "orient"
+job = "coordinator-assessment"
+mode = "own"
+from = []
+
+[[skill]]
 name = "dispatch"
 job = "coordinator-dispatch"
 mode = "own"

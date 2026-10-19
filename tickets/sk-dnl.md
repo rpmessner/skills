@@ -2,7 +2,7 @@
 id: sk-dnl
 title: "orient skill: coordinator start-of-session assessment"
 type: feature
-status: open
+status: in_progress
 priority: 2
 parent: null
 blocked_by: []

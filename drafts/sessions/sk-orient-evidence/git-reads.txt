@@ -1,0 +1,207 @@
+$ git -C /home/rpmessner/dev/dotfiles worktree list --porcelain
+worktree /home/rpmessner/dev/dotfiles
+HEAD e01b0f6d5b1a3a508736e740ef2c08a693f3c756
+branch refs/heads/master
+
+
+exit=0
+
+$ git -C /home/rpmessner/dev/dotfiles for-each-ref --format=%(refname:short) %(upstream:short) %(upstream:track) refs/heads
+feat/ai-agent-orchestration origin/feat/ai-agent-orchestration 
+master origin/master [ahead 2]
+
+exit=0
+
+$ git -C /home/rpmessner/dev/dotfiles rev-list --count origin/feat/ai-agent-orchestration..feat/ai-agent-orchestration
+0
+
+exit=0
+
+$ git -C /home/rpmessner/dev/dotfiles rev-list --count origin/master..master
+2
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/cooldown-o-matic worktree list --porcelain
+worktree /home/rpmessner/dev/games/wow-addons/cooldown-o-matic
+HEAD d2ebf2a8fb3a6e0b0482fa609dd480fbfbdfc05e
+branch refs/heads/main
+
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/cooldown-o-matic for-each-ref --format=%(refname:short) %(upstream:short) %(upstream:track) refs/heads
+main  
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/ui-o-matic worktree list --porcelain
+worktree /home/rpmessner/dev/games/wow-addons/ui-o-matic
+HEAD a3a5f67d1d88d56195d23c51f3dc5841137fbb98
+branch refs/heads/epic/cooldown-resource-replacement-and-integration
+
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/ui-o-matic for-each-ref --format=%(refname:short) %(upstream:short) %(upstream:track) refs/heads
+epic/cooldown-resource-replacement-and-integration  
+main origin/main [ahead 67]
+rpmessner/12.1-testing-epic  
+rpmessner/cdm-claim-takeover  
+rpmessner/styling-engine-epic  
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/ui-o-matic rev-list --count origin/main..main
+67
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/we_go_next_dev worktree list --porcelain
+worktree /home/rpmessner/dev/games/wow-addons/we_go_next_dev
+HEAD c4618f2a24f250aca12cdc3dd5450bcee1aa93e1
+branch refs/heads/codex/we-vw1-shared-cooldown
+
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/we_go_next_dev for-each-ref --format=%(refname:short) %(upstream:short) %(upstream:track) refs/heads
+codex/we-vw1-shared-cooldown origin/codex/we-vw1-shared-cooldown [ahead 1]
+main origin/main [behind 4]
+rpmessner/mechanics-classification  
+rpmessner/we-38-silver-survival-action  
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/we_go_next_dev rev-list --count origin/codex/we-vw1-shared-cooldown..codex/we-vw1-shared-cooldown
+1
+
+exit=0
+
+$ git -C /home/rpmessner/dev/games/wow-addons/we_go_next_dev rev-list --count origin/main..main
+0
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine worktree list --porcelain
+worktree /home/rpmessner/dev/music/form-engine
+HEAD 6a43e16e7f6d8f063c850b42b09578419ef3f0cc
+branch refs/heads/main
+
+worktree /home/rpmessner/dev/music/fe-adr
+HEAD fd4f86e86e0385ef3a73a9eedfd6e6d2ef4f4f72
+branch refs/heads/pr/adr-tablet
+
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine for-each-ref --format=%(refname:short) %(upstream:short) %(upstream:track) refs/heads
+fe-sched  
+fe-time  
+main origin/main [ahead 13]
+pr/adr-tablet origin/main [behind 11]
+pr/clay origin/pr/clay 
+pr/launchkey-hardware origin/pr/launchkey-hardware 
+pr/looper origin/pr/looper [ahead 1]
+pr/platform-seam origin/pr/platform-seam 
+pr/scheduler origin/pr/scheduler [gone]
+pr/time-model origin/pr/time-model [gone]
+pr/zig-kit origin/pr/zig-kit 
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/main..main
+13
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/main..pr/adr-tablet
+0
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/pr/clay..pr/clay
+0
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/pr/launchkey-hardware..pr/launchkey-hardware
+0
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/pr/looper..pr/looper
+1
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/pr/platform-seam..pr/platform-seam
+0
+
+exit=0
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/pr/scheduler..pr/scheduler
+fatal: ambiguous argument 'origin/pr/scheduler..pr/scheduler': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+
+exit=128
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/pr/time-model..pr/time-model
+fatal: ambiguous argument 'origin/pr/time-model..pr/time-model': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+
+exit=128
+
+$ git -C /home/rpmessner/dev/music/form-engine rev-list --count origin/pr/zig-kit..pr/zig-kit
+0
+
+exit=0
+
+$ git -C /home/rpmessner/dev/utils/foreman worktree list --porcelain
+worktree /home/rpmessner/dev/utils/foreman
+HEAD 3505996bed28b1aef281f40913a12c7be2058d39
+branch refs/heads/main
+
+worktree /home/rpmessner/dev/utils/fm-coordinator
+HEAD 3505996bed28b1aef281f40913a12c7be2058d39
+branch refs/heads/fm-coordinator
+
+
+exit=0
+
+$ git -C /home/rpmessner/dev/utils/foreman for-each-ref --format=%(refname:short) %(upstream:short) %(upstream:track) refs/heads
+fm-coordinator  
+main origin/main [ahead 14]
+pr/board-live  
+
+exit=0
+
+$ git -C /home/rpmessner/dev/utils/foreman rev-list --count origin/main..main
+14
+
+exit=0
+
+$ git -C /home/rpmessner/dev/utils/skills worktree list --porcelain
+worktree /home/rpmessner/dev/utils/skills
+HEAD c88228eae3bdf47192f23f3032e75106422e6d8c
+branch refs/heads/main
+
+worktree /home/rpmessner/dev/utils/sk-orient
+HEAD c88228eae3bdf47192f23f3032e75106422e6d8c
+branch refs/heads/sk-orient
+
+
+exit=0
+
+$ git -C /home/rpmessner/dev/utils/skills for-each-ref --format=%(refname:short) %(upstream:short) %(upstream:track) refs/heads
+main origin/main [ahead 4]
+sk-orient  
+
+exit=0
+
+$ git -C /home/rpmessner/dev/utils/skills rev-list --count origin/main..main
+4
+
+exit=0

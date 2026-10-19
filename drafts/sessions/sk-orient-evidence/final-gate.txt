@@ -1,0 +1,47 @@
+46 skills, always-on ~1288/2500 tokens, 0 errors
+tickets valid
+..................................
+----------------------------------------------------------------------
+Ran 34 tests in 16.022s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.094s
+
+OK
+ok   block git push origin main
+ok   block cd /tmp && git push
+ok   block git reset --hard HEAD~1
+ok   block git clean -fdx
+ok   block git branch -D topic
+ok   block rm -rf build
+ok   allow /usr/bin/rm -f build/x.o
+ok   allow git status && ls -la
+ok   allow cd /tmp/house-guard-zh8BwA && git commit -m ok
+ok   block cd /tmp/house-guard-zh8BwA && git commit -m key
+ok   block git -C /tmp/house-guard-zh8BwA commit -m key
+ok   block git commit -m key
+ok   block cd /tmp/house-guard-zh8BwA && git commit -m secret
+ok   block cd /tmp/house-guard-zh8BwA && git commit -m ssh
+ok   block cd /tmp/house-guard-zh8BwA && git commit -m winpath
+ok   block ls with hooks missing (fail closed)
+all ok
+✔ settled question posts once and resumed activity clears through the CLI (57.241351ms)
+✔ confirmation stays pending during sibling tool activity and clears when answered (51.760271ms)
+✔ input dialogs map to input without leaking question text (45.726957ms)
+✔ provider limit posts only after settlement and clears on the next turn (44.670049ms)
+✔ shutdown clears pending waits (44.129729ms)
+✔ ordinary completion, aborted runs and recovered limits do not post waits (0.298984ms)
+✔ untracked sessions are inert and duplicate ticket IDs are delivered only once (95.900555ms)
+✔ missing foreman warns once and never rejects a pi handler (114.025873ms)
+✔ hung CLI cannot block handlers and is killed within the bound (5017.999674ms)
+✔ CLI remains bounded even when pi exits during delivery (6058.297695ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11535.800962

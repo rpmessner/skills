@@ -43,6 +43,7 @@ Setup and one-off skills (`setup-pre-commit`, `git-guardrails-claude-code`, `mig
 
 ## Operating model
 
+- Coordinator starting or resuming a session → `orient`: fresh, read-only assessment before choosing work.
 - A coordinator Claude Code session plans and dispatches build sessions as pi agents in named tmux windows → `dispatch` (coordinator only). Each build session reports where its brief says.
 - Detect the tracker per repo: `tickets/` → direct `foreman` ticket commands; otherwise `.beads/` → `bd` until user-approved `foreman adopt`. With neither, ask to onboard. The `foreman` skill separates ticket content from best-effort board events.
 - Build-time questions go through `foreman ask decision` and `foreman wait`, not pane prompts. Spec interviews and grilling stay conversational.

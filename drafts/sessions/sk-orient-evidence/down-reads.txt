@@ -1,0 +1,1172 @@
+$ curl --fail --silent --show-error --max-time 5 http://127.0.0.1:1/needs-you
+curl: (28) Connection timed out after 5000 milliseconds
+
+exit=28
+$ foreman ls --overlay --json
+{"warning":"foreman unavailable; read was not queued"}
+
+exit=0
+$ foreman ls --json
+[
+  {
+    "id": "sk-5o2",
+    "parent": null,
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s",
+    "parent": null,
+    "status": "open",
+    "type": "epic"
+  },
+  {
+    "id": "sk-81s.1",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.10",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "decision"
+  },
+  {
+    "id": "sk-81s.11",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.12",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.13",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.14",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.2",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.3",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.4",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.5",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.6",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.7",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.8",
+    "parent": "sk-81s",
+    "status": "open",
+    "type": "task"
+  },
+  {
+    "id": "sk-81s.9",
+    "parent": "sk-81s",
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-9ro",
+    "parent": null,
+    "status": "open",
+    "type": "epic"
+  },
+  {
+    "id": "sk-9ro.1",
+    "parent": "sk-9ro",
+    "status": "closed",
+    "type": "feature"
+  },
+  {
+    "id": "sk-9ro.2",
+    "parent": "sk-9ro",
+    "status": "closed",
+    "type": "feature"
+  },
+  {
+    "id": "sk-9ro.3",
+    "parent": "sk-9ro",
+    "status": "in_progress",
+    "type": "task"
+  },
+  {
+    "id": "sk-dnl",
+    "parent": null,
+    "status": "in_progress",
+    "type": "feature"
+  },
+  {
+    "id": "sk-i4k",
+    "parent": null,
+    "status": "open",
+    "type": "epic"
+  },
+  {
+    "id": "sk-lad",
+    "parent": null,
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-osj",
+    "parent": null,
+    "status": "closed",
+    "type": "task"
+  },
+  {
+    "id": "sk-tjc",
+    "parent": null,
+    "status": "closed",
+    "type": "task"
+  }
+]
+exit=0
+$ foreman ready --json
+[
+  {
+    "id": "sk-81s.8",
+    "parent": "sk-81s",
+    "status": "open",
+    "type": "task"
+  }
+]
+exit=0
+$ python3 skills/dispatch/scripts/ready-repos.py /home/rpmessner/dev
+[
+  {
+    "repo": "/home/rpmessner/dev/dotfiles",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "dot-4at",
+        "parent": null,
+        "type": "task"
+      },
+      {
+        "id": "dot-vcx",
+        "parent": null,
+        "type": "chore"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/games/wow-addons/cooldown-o-matic",
+    "tracker": "beads",
+    "tickets": [
+      {
+        "id": "cdo-uha.2",
+        "issue_type": "epic",
+        "parent": "cdo-uha"
+      },
+      {
+        "id": "cdo-4m3.1",
+        "issue_type": "task",
+        "parent": "cdo-4m3"
+      },
+      {
+        "id": "cdo-4m3",
+        "issue_type": "epic"
+      },
+      {
+        "id": "cdo-uha.6",
+        "issue_type": "task",
+        "parent": "cdo-uha"
+      },
+      {
+        "id": "cdo-97h.1",
+        "issue_type": "task",
+        "parent": "cdo-97h"
+      },
+      {
+        "id": "cdo-97h",
+        "issue_type": "epic"
+      },
+      {
+        "id": "cdo-4m3.4",
+        "issue_type": "task",
+        "parent": "cdo-4m3"
+      },
+      {
+        "id": "cdo-tik.2",
+        "issue_type": "task",
+        "parent": "cdo-tik"
+      },
+      {
+        "id": "cdo-tik",
+        "issue_type": "epic"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/games/wow-addons/ui-o-matic",
+    "tracker": "beads",
+    "tickets": [
+      {
+        "id": "wow-x3n8",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-ytwj.1",
+        "issue_type": "task",
+        "parent": "wow-ytwj"
+      },
+      {
+        "id": "wow-ytwj",
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-7lcd.2",
+        "issue_type": "task",
+        "parent": "wow-7lcd"
+      },
+      {
+        "id": "wow-7lcd.1",
+        "issue_type": "task",
+        "parent": "wow-7lcd"
+      },
+      {
+        "id": "wow-7lcd",
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-ni8i",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-2fr5.2",
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.1",
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5",
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-206",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-155",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-154",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-153",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-152",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-151",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-b904",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-9r85",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-xigb",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-2wf7",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-nu6a",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ua29",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-pva7",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-kb55",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-6a2f",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-v7ay",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-8rh9",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-fxak",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-gu9o",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-j1y5",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-m3ss",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-6shw",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-nkcz",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-atod",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-t51f",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-eddt",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-lse4",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-t7g5",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-x3jp",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-46ea",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-5ncv",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-5753",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-0xq0",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-cucw",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-vzgb",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-7lcd.3",
+        "issue_type": "task",
+        "parent": "wow-7lcd"
+      },
+      {
+        "id": "wow-fvih",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-kxvn",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-vz44",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-u5xb",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-227.4",
+        "issue_type": "bug",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-dzu6",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-2fr5.14",
+        "issue_type": "bug",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.13",
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.10",
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.9",
+        "issue_type": "bug",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.8",
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.7",
+        "issue_type": "bug",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.6",
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.5",
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-ch01",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-v7gu",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-3i1o",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-epri",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-f1jg",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-u7e9",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-vvqw",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-232",
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-226",
+        "issue_type": "feature",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-224",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-216",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-207",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-204",
+        "issue_type": "feature",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-203",
+        "issue_type": "feature",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-196",
+        "issue_type": "task",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-190",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-189",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-177",
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-174",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-158",
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-156",
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-146",
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-140",
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-136",
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-135",
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-134",
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-130",
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-107",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-106",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-55vy",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-57n6",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-cz1e",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-hhwq",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-nlbt",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-bojl",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-mfbl",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-co2j",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-xtgj",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-3c6h",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-u0h0",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-y151",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-aqh5",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-dz1y",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-aa4j",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ba7x",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-rhbc",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-azie",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-1bf0",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-8d2w",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-eseg",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-abm0",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ofaz",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ayoi",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-7aey",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ae62",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-v7r8",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-zttw",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-j318",
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-227.3",
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-2fr5.12",
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.4",
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.3",
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-3f8j",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-b770",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-es8s",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-lmtq",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-om30",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-qec6",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-rnlf",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-tdpg",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-utl6",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-w49d",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-xfey",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-zfbd",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-2nli",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-3h58",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-56nh",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-5kla",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-5oef",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-84ie",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-avxy",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-bx83",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-bzfe",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-e90n",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-ea79",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-ecaa",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-fwmi",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-ga15",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-gcko",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-i4v9",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-iu6g",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-jl2p",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-m01h",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-no1b",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-or7a",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-tlwl",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-yvzj",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-237",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-235",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-230",
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-227",
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-208",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-205",
+        "issue_type": "feature",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-180",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-175",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-137",
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-133",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-132",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-131",
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-125",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-124",
+        "issue_type": "feature",
+        "parent": "wow-108"
+      },
+      {
+        "id": "wow-123",
+        "issue_type": "feature",
+        "parent": "wow-108"
+      },
+      {
+        "id": "wow-122",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-121",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-120",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-119",
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-118",
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-117",
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-116",
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-115",
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-114",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-113",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-112",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-111",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-110",
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-108",
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-zwk9",
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-zpt2",
+        "issue_type": "task"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/games/wow-addons/we_go_next_dev",
+    "tracker": "beads",
+    "tickets": [
+      {
+        "id": "we-37",
+        "issue_type": "task",
+        "parent": "we-i7"
+      },
+      {
+        "id": "we-i7",
+        "issue_type": "epic"
+      },
+      {
+        "id": "we-27",
+        "issue_type": "task",
+        "parent": "we-i5"
+      },
+      {
+        "id": "we-28",
+        "issue_type": "task",
+        "parent": "we-i5"
+      },
+      {
+        "id": "we-20",
+        "issue_type": "task",
+        "parent": "we-i3"
+      },
+      {
+        "id": "we-21",
+        "issue_type": "task",
+        "parent": "we-i3"
+      },
+      {
+        "id": "we-i3",
+        "issue_type": "epic"
+      },
+      {
+        "id": "we-24",
+        "issue_type": "task",
+        "parent": "we-i4"
+      },
+      {
+        "id": "we-22",
+        "issue_type": "task",
+        "parent": "we-i3"
+      },
+      {
+        "id": "we-19",
+        "issue_type": "task",
+        "parent": "we-i2"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/music/form-engine",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "fe-813.5",
+        "parent": "fe-813",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.11",
+        "parent": "fe-lwp",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.12",
+        "parent": "fe-lwp",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.16",
+        "parent": "fe-lwp",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.23",
+        "parent": "fe-lwp",
+        "type": "bug"
+      },
+      {
+        "id": "fe-lwp.7",
+        "parent": "fe-lwp",
+        "type": "task"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/utils/foreman",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "fm-3c3.6",
+        "parent": "fm-3c3",
+        "type": "feature"
+      },
+      {
+        "id": "fm-c2w.11",
+        "parent": "fm-c2w",
+        "type": "task"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/utils/skills",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "sk-81s.8",
+        "parent": "sk-81s",
+        "type": "task"
+      },
+      {
+        "id": "sk-dnl",
+        "parent": null,
+        "type": "feature"
+      }
+    ]
+  }
+]
+exit=0

@@ -1,0 +1,1655 @@
+[
+  {
+    "repo": "/home/rpmessner/dev/dotfiles",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "dot-4at",
+        "parent": null,
+        "priority": 3,
+        "status": "open",
+        "title": "Decide zsh formatting: shfmt corrupts zsh, so dprint no longer formats .zsh",
+        "type": "task"
+      },
+      {
+        "id": "dot-vcx",
+        "parent": null,
+        "priority": 4,
+        "status": "open",
+        "title": "Remove or wire committed.toml (commit-msg hook uses cog)",
+        "type": "chore"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/games/wow-addons/cooldown-o-matic",
+    "tracker": "beads",
+    "tickets": [
+      {
+        "id": "cdo-uha.2",
+        "title": "Phase 1: characterize merged behavior at feature level",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "epic",
+        "parent": "cdo-uha"
+      },
+      {
+        "id": "cdo-4m3.1",
+        "title": "Probe trait-config APIs on live client",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "task",
+        "parent": "cdo-4m3"
+      },
+      {
+        "id": "cdo-4m3",
+        "title": "Key design selection off talent loadouts",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "epic"
+      },
+      {
+        "id": "cdo-uha.6",
+        "title": "Follow-up: merge cooldown-o-matic Beads into ui-o-matic",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "cdo-uha"
+      },
+      {
+        "id": "cdo-97h.1",
+        "title": "Evaluate LibEditMode vs hand-rolled EM hook",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "cdo-97h"
+      },
+      {
+        "id": "cdo-97h",
+        "title": "Edit Mode movers (position-only)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "epic"
+      },
+      {
+        "id": "cdo-4m3.4",
+        "title": "Freeze profile layer at single profile",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "cdo-4m3"
+      },
+      {
+        "id": "cdo-tik.2",
+        "title": "Cutover criteria + parity audit (stub)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "cdo-tik"
+      },
+      {
+        "id": "cdo-tik",
+        "title": "North star: replace ui-o-matic cooldowns+resources",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "epic"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/games/wow-addons/ui-o-matic",
+    "tracker": "beads",
+    "tickets": [
+      {
+        "id": "wow-x3n8",
+        "title": "Fix cdo Retail pooled aura initialization ordering",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-ytwj.1",
+        "title": "Pin and extract per-spec current-design resolution",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "task",
+        "parent": "wow-ytwj"
+      },
+      {
+        "id": "wow-ytwj",
+        "title": "[epic] cooldown-o-matic phase 1 pure-core extraction",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-7lcd.2",
+        "title": "Retail switch-over: drop modules/cooldowns from ui-o-matic_Mainline.toc, audit cross-module refs",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "task",
+        "parent": "wow-7lcd"
+      },
+      {
+        "id": "wow-7lcd.1",
+        "title": "Seed coolinator fork repo from installed v116 copy",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "task",
+        "parent": "wow-7lcd"
+      },
+      {
+        "id": "wow-7lcd",
+        "title": "[epic] Retail cooldowns: fork Coolinator, retire ui-o-matic retail cooldowns path",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-ni8i",
+        "title": "CastBar shield errors: SetAlphaFromBoolean(nil) when notInterruptible missing",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-2fr5.2",
+        "title": "MoP: port fojji-derived MoP cooldown class data into modules/cooldowns/data/mop/",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.1",
+        "title": "MoP: add ui-o-matic_Mists.toc (Interface 50504) + deploy to _classic_",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5",
+        "title": "[epic] MoP Classic flavor bring-up + cooldown data",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-206",
+        "title": "[Resources] Charged combo points (Animacharge / Supercharger)",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-155",
+        "title": "Investigate initiative to style action bars similarly to cooldown/buff bars",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-154",
+        "title": "Figure out an elegant way to reorder stacking direction for blizzard cdm bars",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-153",
+        "title": "when setting up a new alt for the first time, resource settings snap back to default value at some point",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-152",
+        "title": "Figure out way to connect edit mode movers of main chat panel and blizz main chat panel",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-151",
+        "title": "Add various contextual icons for the blizzard player frame",
+        "status": "open",
+        "priority": 1,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-b904",
+        "title": "Skinning: minimal tooltip + popup theming (tokens only, no content knobs)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-9r85",
+        "title": "Items region: potion preset families with displayOrder + swap-when-missing",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-xigb",
+        "title": "Resources: Aug Evoker Ebon Might via 12.1 engine-slot pattern",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-2wf7",
+        "title": "Objectives: tracker visual pass - completed/focused coloring, quest-type icons, background panel",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-nu6a",
+        "title": "Profiles: shareable import/export string",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ua29",
+        "title": "Minimap: button corral pin/POI exclusion + per-button ungroup",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-pva7",
+        "title": "Minimap: square hit-region overlay + hover-reveal chrome + zoom persistence",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-kb55",
+        "title": "Chat: session history - persist recent chat across /reload and relog",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-6a2f",
+        "title": "Chat: idle fade with mouse passthrough",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-v7ay",
+        "title": "PARITY ledger surgery: matrix-found contradictions (minimap/chat/objectives/bags/fonts/resources/cooldowns/unitframes)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-8rh9",
+        "title": "Resources: no vehicle suppression - bars render over the vehicle UI",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-fxak",
+        "title": "Bags: Baganator skin listener - border heuristic tints art, dead EditBox backdrop, unverified regionType keys",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-gu9o",
+        "title": "Objectives: Setup dead without retry + unbounded ticker + uninstrumented full-tree restyle",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-j1y5",
+        "title": "BlizzardFonts: number/system overrides hardcode sizes and strip outlines",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-m3ss",
+        "title": "MoveMode: position store split-brain - global UIO.db.positions vs profile stores",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-6shw",
+        "title": "Options window: scroll content height fixed at 1000px - taller sections unreachable",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-nkcz",
+        "title": "Minimap: Retail native suppression misses - duplicate mail icon, surviving zone text, queue eye, invisible-clickable cluster buttons",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-atod",
+        "title": "Chat: tab reparenting into dock panels - wrong restore parent + FCF_* hook taint class",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-t51f",
+        "title": "Minimap: Retail tracking button menu is dead code (UIDropDownMenu removed 11.0)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-eddt",
+        "title": "Chat: declutter never reaches temp windows and resurrects on hover",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-lse4",
+        "title": "Chat: URL linkify double-wraps scheme+www URLs into mangled nested links",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-t7g5",
+        "title": "Databars: travel datatext (secure hearthstone click + M+ teleports)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-x3jp",
+        "title": "Databars: Great Vault datatext (weekly reward rows + keystone)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-46ea",
+        "title": "Databars: house-favor coverage once Blizzard status containers are fully suppressed",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-5ncv",
+        "title": "RepBars: Blizzard XP bar still renders - SecondaryStatusTrackingBarContainer never killed",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-5753",
+        "title": "RepBars: rep bar max misaligns for renown/friendship factions (wrong API ladder)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-0xq0",
+        "title": "Fix cooldown-o-matic Stack child alignment after bounds remeasurement",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-cucw",
+        "title": "UnitFrames: ClassColor errors on secret class token in combat (12.1)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-vzgb",
+        "title": "Live-verify Retail unit-frame tap-denied color transitions",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-7lcd.3",
+        "title": "Parity audit: ui-o-matic retail cooldown features vs Coolinator",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-7lcd"
+      },
+      {
+        "id": "wow-fvih",
+        "title": "Cooldowns: buffs jump to a new position when entering /uiom regions",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-kxvn",
+        "title": "Cooldowns: per-family palettes for untracked entries \u2014 no CDM profile writes",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-vz44",
+        "title": "Resources: Astral Power bar for non-Balance druids in Moonkin Form",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-u5xb",
+        "title": "Cooldowns: Blizzard CDM Edit Mode movers jump/stretch under the takeover \u2014 pin claimed viewers to a static footprint",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-227.4",
+        "title": "Resources 12.1: target-stacks must self-track auraInstanceIDs \u2014 CDM frames carry no aura data on PTR",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-dzu6",
+        "title": "MoP demo lock: Corruption CDM icon swaps to Doom art in Metamorphosis while still tracking Corruption",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-2fr5.14",
+        "title": "[bug] UnitFrames absorb overlay floats off-frame (anchored to a hidden sibling)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.13",
+        "title": "Cooldowns engine: cdSource (read cooldown from a different spell) + aura-driven icon swap + spell charges",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.10",
+        "title": "MoP Warlock: per-spec secondary resources (Soul Shards / Demonic Fury / Burning Embers)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.9",
+        "title": "[bug] MoP reminders: mutually-exclusive buffs authored as separate, unsatisfiable entries",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.8",
+        "title": "Frost Mage MoP: Icicles secondary bar (predicted counter) replacing the dead FREEZING_STACKS bar",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.7",
+        "title": "[bug] Resource tick spark models the five-second rule on MoP, where it does not exist",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.6",
+        "title": "MoP: verify UnitFrames on MoP Classic (suppression, anchoring, element coverage)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.5",
+        "title": "MoP: verify resources module against MoP 5.5 power-type drift",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-ch01",
+        "title": "Testing: fill the TESTING_PLAN coverage matrix with feature-level suites",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-v7gu",
+        "title": "Style engine: migrate unit-frame layout callers + deeper border structures to style documents",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-3i1o",
+        "title": "Resources: probe TFT/Renewing Mist charge APIs on Retail + 12.1 PTR",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-epri",
+        "title": "UnitFrames: target reaction/tapped color stale while tab-targeting in combat",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-f1jg",
+        "title": "Profiles: browser, import/export, named profiles, migrate remaining modules",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-u7e9",
+        "title": "Cooldowns: classic items row \u2014 racials + bag potions",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-vvqw",
+        "title": "Resources: remaining aura-tracking bars \u2014 Mistweaver Teachings, WW Hit Combo, Devourer stack max, DH Meta timer",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-232",
+        "title": "Cooldowns: region editor settings surface (drag-between-regions, Unused pool)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-226",
+        "title": "Cooldowns: rebuild racial/trinket/potion bar from Blizzard CDM icons and repair 12.1 border styling",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-224",
+        "title": "When XP and Rep bar are both showing, the hiding of retail blizzard bars doesn't function",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-216",
+        "title": "Options panel coherence review + semantic category-token migration",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-207",
+        "title": "[Resources] Add missing class-resource bars: Icicles, Ironfur, Ignore Pain, Ebon Might",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-204",
+        "title": "[Style] Halo/shadow border texture presets (close rounded-border GAP)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-203",
+        "title": "[Style] Pixel-snapped border engine + scale-change resnap registry",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-196",
+        "title": "[Style] T6 \u2014 Dropdown widget + generic knob-panel generator + colorRule editor",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-190",
+        "title": "[Epic] Style engine & Designers (Unit Frame Designer + Element Studio)",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-189",
+        "title": "Move Warcraft Logs API token out of database storage",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-177",
+        "title": "[Phase 2 follow-up] Reduce Classic Era / SoD cooldown aura allocation churn",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-174",
+        "title": "Architecture: unify module state and profile storage",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-158",
+        "title": "[Phase 3 follow-up] Memory and GC churn reduction pass",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-156",
+        "title": "[Phase 1 follow-up] Capture TBC perf baselines",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-146",
+        "title": "[Phase 2] Cross-flavor guard audit and invariant coverage",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "wow-140"
+      },
+      {
+        "id": "wow-140",
+        "title": "Epic: Code Health \u2014 performance, static analysis & clarity",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-136",
+        "title": "UnitFrames: castbar and aura breadth beyond target",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-135",
+        "title": "UnitFrames: prediction and absorb overlay hardening",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-134",
+        "title": "UnitFrames: boss1-5 group frames and boss-specific auras",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-130",
+        "title": "UnitFrames: cataloging, settings, and polish hardening",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-107",
+        "title": "Research roadmap: Retail parity gaps",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-106",
+        "title": "Research roadmap: original -omatic parity remaining modules",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-55vy",
+        "title": "Targeted spell bars - casts aimed at us, collected in one group",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-57n6",
+        "title": "Damage meter on C_DamageMeter (one window)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-cz1e",
+        "title": "Nameplates: designer-first bring-up decision (post-0008/0009)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-hhwq",
+        "title": "Resources: Skyriding vigor pips",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-nlbt",
+        "title": "Databars: stat diminishing-returns readout",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-bojl",
+        "title": "Databars: gold history tooltip on the gold datatext",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-mfbl",
+        "title": "Cooldowns: extend reminders row - group-scope raid buffs, consumables, clickable secure reminders",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-co2j",
+        "title": "CDM: FocusKick-style interrupt bar on the focus target (evaluate)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-xtgj",
+        "title": "CDM: stable keybind text across action-bar page swaps",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-3c6h",
+        "title": "cdo cast bar: latency overlay + channel tick markers",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-u0h0",
+        "title": "Resources: secret-safe threshold recolor via C_CurveUtil color curves",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-y151",
+        "title": "Resources: spec smalls - charged combo points recolor + Arms Sweeping Strikes counter",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-aqh5",
+        "title": "UnitFrames: player aura bars - replace Blizzard buff frame (scoped)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-dz1y",
+        "title": "UnitFrames: threat cues + dispel-school tint + shared range fade",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-aa4j",
+        "title": "UnitFrames: weapon-enchant bars (also serves cooldowns weapon-enchant reminders)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ba7x",
+        "title": "UnitFrames: register frames in ClickCastFrames (Clique interop)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-rhbc",
+        "title": "Objectives: boss-encounter hide + combat-safe hide + event suspension",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-azie",
+        "title": "Core: shared visibility/cursor/ticker services (narrow vocabulary)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-1bf0",
+        "title": "Core: pixel-perfect UIParent scale management",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-8d2w",
+        "title": "QoL curated adoptions: auto combat logging + battle-res counter",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-eseg",
+        "title": "Core: kick/interrupt readiness service",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-abm0",
+        "title": "Options: module enable/disable section + generic Profiles section",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ofaz",
+        "title": "Core: one-time migration runner (id-keyed, per-scope, pcall'd)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ayoi",
+        "title": "Minimap: compact instance-difficulty text token (M+15 / 20M / T8)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-7aey",
+        "title": "Chat: usability smalls - scroll-to-bottom, hyperlink hover tooltips, chatMouseScroll, headerSuffix, copy colors",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-ae62",
+        "title": "Chat: message-text upgrades - short channel names, class-colored names in bodies, timestamp-all",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-v7r8",
+        "title": "Minimap: HasNewMail() unguarded against 12.x secret values",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-zttw",
+        "title": "Minimap: coordinates readout 2s stale + orphaned coordPrecision config",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-j318",
+        "title": "Cooldowns: claim BuffBar viewer into the bars region (tracked bars adoption)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-227.3",
+        "title": "Cooldowns: migrate retail CDM styling bookkeeping off Blizzard frames",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-2fr5.12",
+        "title": "MoP cooldowns: audit which tracked procs should show stack counts",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.4",
+        "title": "Cooldowns: port fojji proc-texture (spell alert) layer",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-2fr5.3",
+        "title": "Cooldowns MoP: port legacy per-entry display features (trackDebuff / chargeSource / swapWhen / activeDuration)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-2fr5"
+      },
+      {
+        "id": "wow-3f8j",
+        "title": "UnitFrames: per-frame power toggles + attached player castbar mode",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-b770",
+        "title": "Appearance: warn/proc color knobs + panel opacity",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-es8s",
+        "title": "UnitFrames: boss-frame suppression + hidden-parent/state-driver replacement strategy",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-lmtq",
+        "title": "UnitFrames: default visual style decisions + deeper BBF dark-mode adoption",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-om30",
+        "title": "Skinning: convert remaining hardcoded GameFont* uses",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-qec6",
+        "title": "UnitFrames: percent text + smoothing for secret-safe health/power",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-rnlf",
+        "title": "Media: sound registry (RegisterSound / fetch shape)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-tdpg",
+        "title": "UnitFrames: revisit residual aura/display allocations with a stronger capture",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-utl6",
+        "title": "Skinning: secret-value guard for GetEffectiveScale on Retail",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-w49d",
+        "title": "UnitFrames: QUI-style layout integration",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-xfey",
+        "title": "Skinning: per-element styles for DoT cue / proc glow + settings auto-gen from style registry",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-zfbd",
+        "title": "UnitFrames: Classic Era load-smoke verification owed",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-2nli",
+        "title": "Resources: broaden spec-keyed power override table",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-3h58",
+        "title": "Databars: Retail honor-level fallback rep bar",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-56nh",
+        "title": "Cooldowns: probe real debuff aura ids for form-aware abilities (Mangle, Faerie Fire)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-5kla",
+        "title": "Cooldowns: tag remaining data with talent curation + verify GetTalentInfo names",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-5oef",
+        "title": "Cooldowns: cdprobe spot-check remaining classes; author DK data",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-84ie",
+        "title": "Resources: deeper Evoker Essence nuance + uncovered class resources",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-avxy",
+        "title": "Cooldowns: per-row show/hide toggles",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-bx83",
+        "title": "Resources: prediction talent/combat-context scanner (Elemental/Shadow multi-target + procs)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-bzfe",
+        "title": "Databars: themed backdrop/separator behind datatext strips",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-e90n",
+        "title": "Resources: threshold coverage \u2014 broader TBC energy/rage costs + remaining retail specs",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-ea79",
+        "title": "Resources: swing bar dual-wield re-detect on equipment change",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-ecaa",
+        "title": "Cooldowns: tag more spells/classes with glow/light-up",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-fwmi",
+        "title": "Cooldowns: more per-row pop-out knobs + control types",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-ga15",
+        "title": "Cooldowns: more indicators \u2014 interrupt flash, ready pulse, range tint, DoT-missing tint",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-gcko",
+        "title": "Cooldowns: spell charges mechanism",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-i4v9",
+        "title": "Objectives: port ObjectiveTrackerOmatic max-height clamp (Classic/TBC)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-iu6g",
+        "title": "Cooldowns: deeper native CDM per-spell settings parity (Retail)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-jl2p",
+        "title": "Cooldowns: verify hand-authored TBC warlock rank ids in-game",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-m01h",
+        "title": "Cooldowns: Bloodlust bar live verification",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-no1b",
+        "title": "Resources: move Prot Warrior Shield Block/Ignore Pain to cooldown/buff tracking",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-or7a",
+        "title": "Databars: remaining Retail datatext parity bits",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-tlwl",
+        "title": "Cooldowns: Paladin Era/SoD live cdprobe verification + TBC rank chains",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-yvzj",
+        "title": "Bags: item-level and stack-count overlays on Blizzard bags/bank",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-237",
+        "title": "Freezing target-stacks bar sticks at 0 in combat until stacks are fully consumed (Retail)",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-235",
+        "title": "12.1: adopt AuraContainer/AuraButton display API + audit index-based aura scans for secret lockdown",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-230",
+        "title": "Cooldowns: claim engine \u2014 owned containers, cached anchors, event-driven relayout",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "wow-227"
+      },
+      {
+        "id": "wow-227",
+        "title": "Epic: Owned cooldown bars \u2014 CDM claim-model takeover",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "epic"
+      },
+      {
+        "id": "wow-208",
+        "title": "[Resources] Per-bar out-of-combat / target-based visibility & fade modes",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-205",
+        "title": "[Style] Add shape-mask + FlipBook atlas glow indicator types",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-190"
+      },
+      {
+        "id": "wow-180",
+        "title": "Follow-up: attribute Retail primary power-event memory churn",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-175",
+        "title": "Architecture: create a Dev artifact store",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-137",
+        "title": "UnitFrames: party and raid frame disposition",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-109"
+      },
+      {
+        "id": "wow-133",
+        "title": "borders are inconsistent between restyled blizzard cooldown bars and our own bars",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-132",
+        "title": "Destro warlock soul shards partial state fade inconsistent",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-131",
+        "title": "Retail minimap header items still appear orphaned in the ui",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "bug"
+      },
+      {
+        "id": "wow-125",
+        "title": "Research CombatLogOmatic disposition",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-124",
+        "title": "Research broader coexistence/adoption set",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-108"
+      },
+      {
+        "id": "wow-123",
+        "title": "Research Bartender4 replacement / ActionbarOmatic adoption",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-108"
+      },
+      {
+        "id": "wow-122",
+        "title": "Research visual style and media controls pass",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-121",
+        "title": "Research CDM-style cooldown settings editor",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-120",
+        "title": "Research launcher, identity, and addon entry point polish",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-119",
+        "title": "Research Blizzard BuffBarCooldownViewer skinning",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-118",
+        "title": "Research Retail databar/repbar extras",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-117",
+        "title": "Research Retail resource prediction/spec nuance gaps",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-116",
+        "title": "Research Retail resource aura-tracking gaps",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-115",
+        "title": "Research Retail cooldown CDM parity gaps",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-107"
+      },
+      {
+        "id": "wow-114",
+        "title": "Research Bags/Baganator residual parity and define closure plan",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-113",
+        "title": "Research ObjectiveTracker residual parity and define closure plan",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-112",
+        "title": "Research GatherOmatic and define module/coexistence epic",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-111",
+        "title": "Research FormOmatic and define module epic",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-110",
+        "title": "Research CombatTextOmatic and define module epic",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature",
+        "parent": "wow-106"
+      },
+      {
+        "id": "wow-108",
+        "title": "Research roadmap: later third-party replacement/adoption candidates",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "feature"
+      },
+      {
+        "id": "wow-zwk9",
+        "title": "Evaluate: Quickdraw-style hold-to-open secure action palette",
+        "status": "open",
+        "priority": 4,
+        "issue_type": "task"
+      },
+      {
+        "id": "wow-zpt2",
+        "title": "Media: extend Blizzard font override to more named surfaces on request",
+        "status": "open",
+        "priority": 4,
+        "issue_type": "task"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/games/wow-addons/we_go_next_dev",
+    "tracker": "beads",
+    "tickets": [
+      {
+        "id": "we-37",
+        "title": "Retail-current defensive & consumable catalog with cooldown/talent metadata",
+        "status": "open",
+        "priority": 0,
+        "issue_type": "task",
+        "parent": "we-i7"
+      },
+      {
+        "id": "we-i7",
+        "title": "7. Defensives & Consumables",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "epic"
+      },
+      {
+        "id": "we-27",
+        "title": "Build gold deaths and damage summaries detail slice",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "we-i5"
+      },
+      {
+        "id": "we-28",
+        "title": "Build gold debuff and observed impact summaries",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "we-i5"
+      },
+      {
+        "id": "we-20",
+        "title": "Classify-from-observation UI",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "we-i3"
+      },
+      {
+        "id": "we-21",
+        "title": "'unavoidable' suppression model + UI",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "task",
+        "parent": "we-i3"
+      },
+      {
+        "id": "we-i3",
+        "title": "3. User Mechanic Classification UI",
+        "status": "open",
+        "priority": 2,
+        "issue_type": "epic"
+      },
+      {
+        "id": "we-24",
+        "title": "Expand fact semantics for source-imported mechanics",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "we-i4"
+      },
+      {
+        "id": "we-22",
+        "title": "Rule edit/override + rebuild from UI",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "we-i3"
+      },
+      {
+        "id": "we-19",
+        "title": "Bespoke per-boss detector framework",
+        "status": "open",
+        "priority": 3,
+        "issue_type": "task",
+        "parent": "we-i2"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/music/form-engine",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "fe-813.5",
+        "parent": "fe-813",
+        "priority": 2,
+        "status": "open",
+        "title": "Overdub, multitrack and the standard voice set",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.11",
+        "parent": "fe-lwp",
+        "priority": 2,
+        "status": "open",
+        "title": "Fixtures from real_book_ex charts: lines cooked over real changes",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.12",
+        "parent": "fe-lwp",
+        "priority": 3,
+        "status": "open",
+        "title": "form field: follow SMF meter changes",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.16",
+        "parent": "fe-lwp",
+        "priority": 2,
+        "status": "open",
+        "title": "Linux backend: ALSA sequencer MIDI + native/WSLg build of form-listen and the probe",
+        "type": "task"
+      },
+      {
+        "id": "fe-lwp.23",
+        "parent": "fe-lwp",
+        "priority": 1,
+        "status": "open",
+        "title": "Bug: hint keyboard showed G7's keys while NOW said Dm7",
+        "type": "bug"
+      },
+      {
+        "id": "fe-lwp.7",
+        "parent": "fe-lwp",
+        "priority": 1,
+        "status": "open",
+        "title": "Hardware bring-up day: firmware, ports, pads, live field readout, first take",
+        "type": "task"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/utils/foreman",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "fm-3c3.6",
+        "parent": "fm-3c3",
+        "priority": 2,
+        "status": "open",
+        "title": "Coordinator session: resume or launch from the coord command, tracked on the board",
+        "type": "feature"
+      },
+      {
+        "id": "fm-c2w.11",
+        "parent": "fm-c2w",
+        "priority": 2,
+        "status": "open",
+        "title": "A day of real use through the board",
+        "type": "task"
+      }
+    ]
+  },
+  {
+    "repo": "/home/rpmessner/dev/utils/skills",
+    "tracker": "files",
+    "tickets": [
+      {
+        "id": "sk-81s.8",
+        "parent": "sk-81s",
+        "priority": 3,
+        "status": "open",
+        "title": "Optional: weekly scheduled report-only skills-sync agent",
+        "type": "task"
+      },
+      {
+        "id": "sk-dnl",
+        "parent": null,
+        "priority": 2,
+        "status": "open",
+        "title": "orient skill: coordinator start-of-session assessment",
+        "type": "feature"
+      }
+    ]
+  }
+]
