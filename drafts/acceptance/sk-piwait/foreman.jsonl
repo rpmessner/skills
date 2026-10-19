@@ -1,0 +1,6 @@
+["ask", "session_waiting", "fm-live", "--reason", "input", "--session", "sk-piwait-live", "--window", "sk-piwait-live", "--actor", "pi"]
+["session-hook", "UserPromptSubmit", "fm-live", "--session", "sk-piwait-live", "--window", "sk-piwait-live", "--actor", "pi"]
+["ask", "session_waiting", "fm-live", "--reason", "permission", "--session", "sk-piwait-live", "--window", "sk-piwait-live", "--actor", "pi"]
+["session-hook", "UserPromptSubmit", "fm-live", "--session", "sk-piwait-live", "--window", "sk-piwait-live", "--actor", "pi"]
+["ask", "session_waiting", "fm-live", "--reason", "input", "--session", "sk-piwait-live", "--window", "sk-piwait-live", "--actor", "pi"]
+["session-hook", "UserPromptSubmit", "fm-live", "--session", "sk-piwait-live", "--window", "sk-piwait-live", "--actor", "pi"]

@@ -1,0 +1,3 @@
+PASS: test killed mutation: confirm becomes input
+PASS: test killed mutation: limit classification removed
+PASS: test killed mutation: resume clearing removed

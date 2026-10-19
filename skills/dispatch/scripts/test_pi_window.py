@@ -39,7 +39,7 @@ sys.exit(subprocess.call(["/usr/bin/zsh", "-f", "-c", sys.argv[-1]]))
 ''')
         self.executable("pi", '''import json, os, sys
 with open(os.environ["LOG"], "a") as f:
-    f.write(json.dumps(["pi", os.environ.get("FOREMAN_ACTOR"), os.environ.get("FOREMAN_SESSION"), sys.argv[1:]]) + "\\n")
+    f.write(json.dumps(["pi", os.environ.get("FOREMAN_ACTOR"), os.environ.get("FOREMAN_SESSION"), sys.argv[1:], os.environ.get("FOREMAN_TICKETS")]) + "\\n")
 ''')
         self.executable("foreman", '''import json, os, sys
 with open(os.environ["LOG"], "a") as f:
@@ -63,7 +63,7 @@ sys.exit(int(os.environ.get("FOREMAN_EXIT", "0")))
         result = self.launch("--model", "provider/model")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.events()[0], ["pi", "pi", "slice",
-                         ["--name", "slice", "--model", "provider/model", "Build this slice."]])
+                         ["--name", "slice", "--model", "provider/model", "Build this slice."], ""])
 
     def test_dispatches_each_ticket_after_launch_with_metadata(self):
         result = self.launch("--bead", "sk-1", "--bead", "sk-2", "--report", str(self.report),
@@ -71,6 +71,7 @@ sys.exit(int(os.environ.get("FOREMAN_EXIT", "0")))
         self.assertEqual(result.returncode, 0, result.stderr)
         events = self.events()
         self.assertEqual([event[0] for event in events], ["pi", "foreman", "foreman"])
+        self.assertEqual(events[0][4], "sk-1 sk-2")
         self.assertEqual(events[0][3], ["--name", "slice", "--model", "provider/model",
                                        "-e", "/tmp/extension", "Build this slice."])
         for event, ticket in zip(events[1:], ["sk-1", "sk-2"]):
