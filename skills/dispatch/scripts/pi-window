@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
-# Launch a pi build session in a new tmux window of the current tmux session.
-# usage: pi-window <window-name> <workdir> <brief-file> [--bead ID ... --report PATH] [--] [pi-args...]
+# Launch a pi build in a new window, or a named pane of the caller's window.
+# usage: pi-window [--pane] <name> <workdir> <brief-file> [--bead ID ... --report PATH] [--] [pi-args...]
 # The brief file's contents become pi's first message; extra args go to pi before it
 # (e.g. `-e <path>` to try an extension for this run only). pi runs under an interactive
 # zsh so ~/.zshrc.local's pi() wrapper (TypeSafe key, Jev flags) applies.
 set -euo pipefail
-[ $# -ge 3 ] || { echo "usage: pi-window <window-name> <workdir> <brief-file> [--bead ID ... --report PATH] [--] [pi-args...]" >&2; exit 2; }
+mode=window
+if [ "${1:-}" = --pane ]; then mode=pane; shift; fi
+[ $# -ge 3 ] || { echo "usage: pi-window [--pane] <name> <workdir> <brief-file> [--bead ID ... --report PATH] [--] [pi-args...]" >&2; exit 2; }
 name=$1 dir=$2 brief=$3
 shift 3
 beads=() report=""
@@ -38,6 +40,9 @@ done
 [ -s "$brief" ] || { echo "brief file missing or empty: $brief" >&2; exit 2; }
 [ -n "${TMUX:-}" ] || { echo "not inside tmux" >&2; exit 2; }
 if tmux list-windows -F '#W' | grep -qx "$name"; then echo "window already exists: $name" >&2; exit 1; fi
+if tmux list-panes -s -F '#{pane_id} #{@build}' | awk -v name="$name" '$2 == name { found=1 } END { exit !found }'; then
+  echo "pane already exists: $name" >&2; exit 1
+fi
 brief=$(realpath "$brief")
 dir=$(realpath "$dir")
 base=$(git -C "$dir" rev-parse HEAD 2>/dev/null) || base=unknown
@@ -47,9 +52,21 @@ report=${report:-drafts/sessions/$name.md}
 [[ $report = /* ]] || report="$dir/$report"
 launch="export FOREMAN_ACTOR=pi FOREMAN_SESSION=$name FOREMAN_TICKETS=$(printf '%q' "${beads[*]}"); pi --name \"$name\"$extra \"\$(<$(printf '%q' "$brief"))\"; echo; echo \"[pi exited] press enter\"; read"
 launch=${launch//\'/\'\\\'\'}
-tmux new-window -d -n "$name" -c "$dir" "zsh -ic '$launch'"
-tmux set-option -w -t ":$name" automatic-rename off >/dev/null
-echo "launched pi in window '$name' ($dir)"
+target=$name
+if [ "$mode" = pane ]; then
+  [ -n "${TMUX_PANE:-}" ] || { echo "pane mode requires TMUX_PANE" >&2; exit 2; }
+  target=$(tmux split-window -d -h -t "$TMUX_PANE" -P -F '#{pane_id}' -c "$dir" "zsh -ic '$launch'")
+  tmux set-option -p -t "$target" @build "$name"
+  tmux select-pane -t "$target" -T "$name"
+  # Equal tiles keep the coordinator readable even when it is not the first pane.
+  tmux select-pane -t "$TMUX_PANE"
+  tmux select-layout -t "$TMUX_PANE" tiled >/dev/null
+  echo "launched pi in pane '$name' ($target) ($dir)"
+else
+  tmux new-window -d -n "$name" -c "$dir" "zsh -ic '$launch'"
+  tmux set-option -w -t ":$name" automatic-rename off >/dev/null
+  echo "launched pi in window '$name' ($dir)"
+fi
 if [ "${#beads[@]}" -gt 0 ]; then
   if ! command -v foreman >/dev/null 2>&1; then
     echo "warning: foreman not installed; continuing" >&2
@@ -57,7 +74,7 @@ if [ "${#beads[@]}" -gt 0 ]; then
     sender=$(dirname "$(realpath "$0")")/../../foreman/scripts/foreman-send
     for id in "${beads[@]}"; do
       (cd "$dir"; FOREMAN_ACTOR=pi FOREMAN_SESSION="$name" bash "$sender" dispatch "$id" \
-        --window "$name" --harness pi --model "$model" --workdir "$dir" \
+        --window "$target" --harness pi --model "$model" --workdir "$dir" \
         --branch "$branch" --base "$base" --brief "$brief" --report "$report") || \
         echo "warning: foreman adapter unavailable; continuing" >&2
     done

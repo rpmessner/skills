@@ -2,7 +2,7 @@
 id: sk-fkb
 title: "dispatch: build sessions as panes in the epic coordinator's window"
 type: feature
-status: open
+status: in_progress
 priority: 2
 parent: null
 blocked_by: []

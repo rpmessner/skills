@@ -1,15 +1,15 @@
 ---
 name: dispatch
-description: "Coordinator only: launch, watch, steer, and close out pi build sessions in named tmux windows, singly or from ready tickets across repos."
+description: "Coordinator only: launch, watch, steer, and close out pi build sessions in named tmux windows or panes, singly or from ready tickets across repos."
 ---
 
 <!-- house: own -->
 
 # Dispatch
 
-You are the coordinator: you plan, brief, verify, and commit. Build work runs in a pi session in its own tmux window, not in your context. Use Claude subagents (Agent tool, pi `subagent`) only when the user asks for them.
+You are the coordinator: you plan, brief, verify, and commit. Build work runs in a separate pi session, not in your context. The main coordinator uses one tmux window per build; epic coordinators use panes in their own window. Use Claude subagents (Agent tool, pi `subagent`) only when the user asks for them.
 
-Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). `pi-window` and `pi-wait` need to run inside tmux and target windows of the current session.
+Scripts live in `~/dev/utils/skills/skills/dispatch/scripts/` (`$D` below). Run the scripts inside the caller's tmux session; they inherit `$TMUX`, including non-default servers such as `-L foreman`. Names are unique across build panes and windows in that session. Launch sequentially to avoid duplicate-check races.
 
 Detect the tracker in each repo: `tickets/` means files; otherwise beads. Use the `foreman` skill's
 direct ticket commands for content/status and its best-effort sender only for board events.
@@ -19,7 +19,7 @@ With neither tracker directory, ask for user-approved `foreman adopt`; dispatch 
 
 ## Dispatch one session
 
-1. **Name the window.** Short kebab-case from the content, ≤31 chars: `house-sync`, `cdo-trait-probe`. The marker is the name upper-cased plus ` DONE`: `HOUSE-SYNC DONE`.
+1. **Name the build** (window or pane). Short kebab-case from the content, ≤31 chars: `house-sync`, `cdo-trait-probe`. The marker is the name upper-cased plus ` DONE`: `HOUSE-SYNC DONE`.
 2. **Write the brief** to `<repo>/drafts/briefs/<window>.md`, or to `/tmp/briefs/<window>.md` when the repo has no drafts dir. Fill every slot:
 
    ```markdown
@@ -63,8 +63,9 @@ With neither tracker directory, ask for user-approved `foreman adopt`; dispatch 
 
    `<base sha>` is `git rev-parse HEAD` in the workdir at dispatch time. For the browser-check slot, inspect `devserve ls` and the app registration using the `devserve` skill's configuration guide; an app with no running units may still be registered. Unregistered apps retain separate ports and their own databases; registering an app needs operator approval. Done when every slot is filled and the marker appears only in the last line's instruction.
 3. **Launch:** `bash "$D/pi-window" <window> <workdir> <brief-file> --bead <id> [--bead <id> ...] --report <report-path> -- --model <provider/model> [pi-args...]`; use the `foreman` skill: the script records `dispatch` after launch, best-effort.
-   Use the brief's ticket IDs and report path; `--bead` is the launcher's legacy flag for either tracker. Pass the chosen model explicitly. It exports `FOREMAN_ACTOR=pi` and `FOREMAN_SESSION=<window>` into pi, captures workdir/branch/base/brief, and refuses duplicate windows. Extra args go to pi (`-e <path>` loads an extension). A workdir pi has not seen (a new worktree) stops at pi's "Trust project folder?" prompt and the session waits there unseen: read the pane right after launch and answer it. Legacy calls without metadata still launch; no IDs means no board dispatch, omitted report defaults to `<workdir>/drafts/sessions/<window>.md`, omitted model records `default` (not a guessed model).
-4. **Wait in the background:** run `$D/pi-wait <window> "<MARKER>" 7200` as a background command, then keep working or return control; do not poll by hand. It matches whole lines only (whitespace-trimmed), so the marker quoted in the brief never counts. Exit codes: 0 `DONE`, 5 `LIMITED` (a provider usage or rate limit stopped the session; the error line follows: post it to the board at once: `foreman ask session_waiting <ticket> --reason usage_limit` where that kind exists, otherwise `foreman ask decision <ticket>` (wait for the reset / continue after a banked reset / switch the model), so it reaches Needs you and a notification, not only chat; act on the answer, then re-wait after the session continues), 6 `BLOCKED` (pi's trust prompt is showing: answer it or trust the parent folder), 7 `IDLE` (nothing on screen changed for `PI_WAIT_IDLE` seconds, default 600, without the marker: fallback detection; read the printed last lines and check for a pending board decision before interrupting its wait. Notify the user about the board request, or recover a question that missed the inbox, then re-wait), 3 `EXITED` (pi quit without the marker: read the pane), 4 timeout (session still running: check the pane, re-wait), 2 window gone.
+   Use the brief's ticket IDs and report path; `--bead` is the launcher's legacy flag for either tracker. Pass the chosen model explicitly. It exports `FOREMAN_ACTOR=pi` and `FOREMAN_SESSION=<window>` into pi, captures workdir/branch/base/brief, and refuses duplicate build names. Extra args go to pi (`-e <path>` loads an extension). A workdir pi has not seen (a new worktree) stops at pi's "Trust project folder?" prompt and the session waits there unseen: read the pane right after launch and answer it. Legacy calls without metadata still launch; no IDs means no board dispatch, omitted report defaults to `<workdir>/drafts/sessions/<window>.md`, omitted model records `default` (not a guessed model).
+   **Pane mode (epic coordinators):** prepend `--pane`: `bash "$D/pi-window" --pane <name> <workdir> <brief-file> --bead <id> --report <report-path> -- --model <provider/model>`. It splits `$TMUX_PANE`'s window, tiles the panes while retaining coordinator focus, and sets the new pane's title and pane-local `@build` tag to `<name>`. Identity is the tag, never a pane index or a mutable title. `FOREMAN_SESSION` and preview ownership remain `<name>`; the existing board `--window` metadata field carries the stable `%pane-id` instead of a window name (board focusing support is tracked separately).
+4. **Wait in the background:** run `bash "$D/pi-wait" <window> "<MARKER>" 7200` (pane build: `bash "$D/pi-wait" --pane <name> "<MARKER>" 7200`) as a background command, then keep working or return control; do not poll by hand. It matches whole lines only (whitespace-trimmed), so the marker quoted in the brief never counts. Exit codes: 0 `DONE`, 5 `LIMITED` (a provider usage or rate limit stopped the session; the error line follows: post it to the board at once: `foreman ask session_waiting <ticket> --reason usage_limit` where that kind exists, otherwise `foreman ask decision <ticket>` (wait for the reset / continue after a banked reset / switch the model), so it reaches Needs you and a notification, not only chat; act on the answer, then re-wait after the session continues), 6 `BLOCKED` (pi's trust prompt is showing: answer it or trust the parent folder), 7 `IDLE` (nothing on screen changed for `PI_WAIT_IDLE` seconds, default 600, without the marker: fallback detection; read the printed last lines and check for a pending board decision before interrupting its wait. Notify the user about the board request, or recover a question that missed the inbox, then re-wait), 3 `EXITED` (pi quit without the marker: read the pane), 4 timeout (session still running: check the pane, re-wait), 2 target gone (pane lookup also fails closed on ambiguous tags). Pane waits bind the resolved pane ID at startup, so a replacement with the same name cannot finish the old wait.
 5. **Follow up** through the board for build-time decisions; its waiting shell receives the answer without pane input. Use the pane for returned review work, recovery, or a new user instruction. Send the text and the Enter as two separate commands, and keep the text to one line:
 
    ```bash
@@ -72,22 +73,30 @@ With neither tracker directory, ask for user-approved `foreman adopt`; dispatch 
    tmux send-keys -t :<window> Enter
    ```
 
-   Read the pane with `tmux capture-pane -p -J -S -200 -t :<window>`.
+   Read a window build with `tmux capture-pane -p -J -S -200 -t :<window>`.
+   For pane builds, resolve the tag before capture or input; stop if lookup fails:
+
+   ```bash
+   target=$(bash "$D/pi-pane" <name>) || exit
+   tmux capture-pane -p -J -S -200 -t "$target"
+   tmux send-keys -t "$target" -l "<text>"
+   tmux send-keys -t "$target" Enter
+   ```
    After sending work back to a session, start a fresh `pi-wait`: it counts only marker lines printed after it starts, so the earlier marker never ends the new wait.
 6. **Close out.**
    1. Read the report file; use the `foreman` skill to send `review` for each reported ticket before running the close-out checks.
    2. Re-run the repo's gate yourself, plus its per-ticket close-out check where it has one (form-engine: `.agents/skills/verify-form-engine/verify closeout <bead-id>` for each reported ticket).
    3. Check each claim against the diff and the evidence. A claim you cannot reproduce is open, not done.
-   4. Run `code-review` on the slice's diff against the brief's base sha, axes one after another in your own context; no subagents unless the user asked for them. Use the `foreman` skill to send `changes` with Critical and Important findings before sending work back (step 5); otherwise list findings as open to the user. If returning work, wait for its new report and restart close-out; do not commit or kill that window yet.
+   4. Run `code-review` on the slice's diff against the brief's base sha, axes one after another in your own context; no subagents unless the user asked for them. Use the `foreman` skill to send `changes` with Critical and Important findings before sending work back (step 5); otherwise list findings as open to the user. If returning work, wait for its new report and restart close-out; do not commit or kill that build yet.
    5. Commit, one commit per slice, only when the user has asked for commits; use the `foreman` skill to send `commit --sha <actual-sha>` for the tickets in that commit, only after it succeeds.
    6. **Request publication after the authorized commit.** Use the `foreman` skill's direct ask/wait commands, not the best-effort sender. For `forge = "none"`, end at commit. Otherwise read the worktree's actual branch and full SHA (`git -C <worktree> branch --show-current`, `git -C <worktree> rev-parse HEAD`); stop on detached HEAD. Name the intended remote branch explicitly, and post `ask push` for a committed ticket covering the slice. Tell the user once in chat that close-out requests are waiting on the board; ask no terminal push/PR question.
       Wait in the background with `foreman wait <push-request-id> --timeout 7200`. Consume `state: done` before posting `ask open_pr` where the repo uses PRs: head = pushed destination, SHA = published SHA, base = repo/stack target, title/body = reviewed PR text. Allow the board's branch snapshot to refresh if creation refuses a newly pushed head. Wait for that request too. Default-branch pushes are only for one-off tickets without an epic; epic work uses a PR. If a matching PR already exists, inspect it rather than requesting a duplicate. When merging is the next step, post `ask merge` for its PR number and current expected head and wait through board confirmation and completion.
       Timeout/warning/decline/failure is not approval: follow the `foreman` outcome table. Keep tickets open and the waiting context available until required requests resolve; never substitute `git push`, `gh pr create`, or `gh pr merge` for the board worker.
    7. Close verified tickets under the repo's policy only after required requests resolve; closing earlier supersedes pending requests. Files: direct `foreman close <id> --reason "<evidence>"`, then `foreman check`; beads: `bd close <id> --reason "<evidence>"`. Ticket-file status changes must also be included in an authorized coordinator commit; a board event doesn't save them to git. If closure changes need publication but no eligible committed ticket remains, report that policy blocker; do not fabricate stage events or push directly.
-   8. **Remove session previews before killing the window.** Run `python3 "$D/preview-cleanup.py" <window>`. It selects exact `owner` matches from `devserve ls --json`, runs `devserve down <unit> --drop-db` for each (including failed/stopped previews), and re-lists to confirm none remain; other owners and main units are untouched. Run it even if the report lists no previews. A missing CLI, failed listing/drop, or remaining preview blocks teardown: keep the window and report the failure, then retry after resolving it. Quiesce browser work before cleanup; don't start new previews during close-out.
-   9. Only after cleanup exits 0, kill the window: `tmux kill-window -t :<window>`.
+   8. **Remove session previews before killing the build.** Run `python3 "$D/preview-cleanup.py" <name>` for either mode (use the build name, not the pane ID). It selects exact `owner` matches from `devserve ls --json`, runs `devserve down <unit> --drop-db` for each (including failed/stopped previews), and re-lists to confirm none remain; other owners and main units are untouched. Run it even if the report lists no previews. A missing CLI, failed listing/drop, or remaining preview blocks teardown: keep the build and report the failure, then retry after resolving it. Quiesce browser work before cleanup; don't start new previews during close-out.
+   9. Only after cleanup exits 0, tear down the build. Window mode: `tmux kill-window -t :<window>`. Pane mode: `target=$(bash "$D/pi-pane" <name>) || exit`, then `tmux kill-pane -t "$target"`. Never kill the epic coordinator's window to close a pane build.
 
-   Done when the gate passes in your own run, every claim is confirmed or listed as open to the user, no Critical review finding is unresolved, required board requests have completed, the session's previews and their databases have been removed, and the window is gone. If a request blocks progress, report its ID and outcome and leave close-out open.
+   Done when the gate passes in your own run, every claim is confirmed or listed as open to the user, no Critical review finding is unresolved, required board requests have completed, the session's previews and their databases have been removed, and the build target is gone. If a request blocks progress, report its ID and outcome and leave close-out open.
 
 ## Dispatch from ready
 

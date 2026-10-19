@@ -59,6 +59,39 @@ sys.exit(int(os.environ.get("FOREMAN_EXIT", "0")))
     def events(self):
         return [json.loads(line) for line in self.log.read_text().splitlines()]
 
+    def test_pane_launch_tags_titles_and_records_exact_target(self):
+        self.env["TMUX_PANE"] = "%7"
+        self.executable("tmux", '''import json, os, sys
+args = sys.argv[1:]
+with open(os.environ["LOG"], "a") as f:
+    f.write(json.dumps(["tmux", args]) + "\\n")
+if args[0] == "split-window": print("%12")
+''')
+        result = subprocess.run(["bash", str(SCRIPT), "--pane", "slice", str(self.repo),
+                                 str(self.brief), "--bead", "sk-1"],
+                                env=self.env, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = [e[1] for e in self.events() if e[0] == "tmux"]
+        split = next(c for c in calls if c[0] == "split-window")
+        self.assertEqual(split[split.index("-t") + 1], "%7")
+        self.assertIn(["set-option", "-p", "-t", "%12", "@build", "slice"], calls)
+        self.assertIn(["select-pane", "-t", "%12", "-T", "slice"], calls)
+        self.assertFalse(any(c[0] == "new-window" for c in calls))
+        board = next(e[3] for e in self.events() if e[0] == "foreman")
+        self.assertEqual(board[board.index("--window") + 1], "%12")
+        self.assertIn("launched pi in pane 'slice' (%12)", result.stdout)
+
+    def test_duplicate_pane_refuses_both_launch_modes(self):
+        self.env["TMUX_PANE"] = "%7"
+        self.executable("tmux", 'import sys\nif sys.argv[1] == "list-panes": print("%12 slice")\n')
+        for mode in ([], ["--pane"]):
+            result = subprocess.run(["bash", str(SCRIPT), *mode, "slice", str(self.repo),
+                                     str(self.brief), "--bead", "sk-1"],
+                                    env=self.env, text=True, capture_output=True)
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("pane already exists", result.stderr)
+            self.assertFalse(self.log.exists())
+
     def test_exports_identity_into_pi(self):
         result = self.launch("--model", "provider/model")
         self.assertEqual(result.returncode, 0, result.stderr)

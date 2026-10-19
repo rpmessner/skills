@@ -49,7 +49,7 @@ and 3 for an out-of-order claim (current stage and allowed events). Keep that di
 retry blindly, fabricate intermediate events or call a warning a successful board update.
 `foreman show <id> --overlay --json` can clarify a refusal later. Read calls never spool.
 
-- **Identity:** build sessions inherit `FOREMAN_ACTOR=pi`, `FOREMAN_SESSION=<window>` from `pi-window`.
+- **Identity:** build sessions inherit `FOREMAN_ACTOR=pi`, `FOREMAN_SESSION=<build-name>` from `pi-window` (also for pane builds).
   Coordinators set `FOREMAN_ACTOR` to their harness (`claude` or `pi`) and `FOREMAN_SESSION` to their
   own session name; `--actor` / `--session` override them. Without an actor the CLI says `user`.
 - **Configuration:** inherit `FOREMAN_URL` (default `http://127.0.0.1:4747`) and `FOREMAN_TOKEN_FILE`
@@ -71,6 +71,9 @@ retry blindly, fabricate intermediate events or call a warning a successful boar
 | Review sends work back to the build session | `foreman changes <id> "<finding and required check>"` |
 | Actual commit exists, user authorized it | `foreman commit <id> --sha <sha>` |
 | User stops / resumes abandoned work | `foreman abandon <id>` / `foreman revive <id>` |
+
+For pane builds, dispatch's existing `--window` field carries the stable tmux `%pane-id`, while
+`FOREMAN_SESSION` stays the logical build name. The CLI has no separate `--pane` switch; do not invent one.
 
 `changes` sends the machine's `request_changes` event. A correction cycle is changes → progress →
 report → review → commit; send review again for the new report. Never emit commit for planned or

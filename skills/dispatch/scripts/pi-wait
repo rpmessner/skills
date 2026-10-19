@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Wait for a pi build session in tmux window <window> to print <marker>.
-# usage: pi-wait <window> <marker> [timeout-seconds]   (default timeout 3600)
+# Wait for a pi build in a window or tagged pane to print <marker>.
+# usage: pi-wait [--pane] <name> <marker> [timeout-seconds]   (default timeout 3600)
 # Polls the pane's whole scrollback. A line matches only if, with leading and
 # trailing whitespace trimmed, it equals the marker exactly: the marker quoted inside
 # the brief or the launch command never matches. Only marker lines printed after
@@ -13,16 +13,30 @@
 # pi's spinner and counters move while it works) (IDLE, with the last screen lines).
 # exit 0 DONE (marker line), 5 LIMITED (prints the error line), 6 BLOCKED (prints the prompt),
 #      7 IDLE (prints the last lines), 3 EXITED ("[pi exited] press enter" line), 4 timeout,
-#      2 window gone, 1 usage.
+#      2 target gone (or ambiguous pane tag), 1 usage.
 set -uo pipefail
-[ $# -ge 2 ] && [ $# -le 3 ] || { echo "usage: pi-wait <window> <marker> [timeout-seconds]" >&2; exit 1; }
+mode=window
+if [ "${1:-}" = --pane ]; then mode=pane; shift; fi
+[ $# -ge 2 ] && [ $# -le 3 ] || { echo "usage: pi-wait [--pane] <name> <marker> [timeout-seconds]" >&2; exit 1; }
 win=$1 marker=$2 timeout=${3:-3600} interval=${PI_WAIT_INTERVAL:-5} idle=${PI_WAIT_IDLE:-600}
 [[ $timeout =~ ^[0-9]+$ ]] || { echo "timeout must be whole seconds: $timeout" >&2; exit 1; }
 [ -n "$(printf '%s' "$marker" | tr -d '[:space:]')" ] || { echo "marker must not be blank" >&2; exit 1; }
 
+target=":$win"
+if [ "$mode" = pane ]; then
+  target=$(bash "$(dirname "$(realpath "$0")")/pi-pane" "$win") || { echo GONE; exit 2; }
+fi
+exists() {
+  if [ "$mode" = pane ]; then
+    tmux list-panes -s -F '#{pane_id}' 2>/dev/null | grep -qxF -- "$target"
+  else
+    tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win"
+  fi
+}
+
 # Prints "<marker lines> <exit lines> <limit lines> <last limit line>" over the whole scrollback.
 count() {
-  tmux capture-pane -p -J -S - -t ":$win" 2>/dev/null | M="$marker" awk '
+  tmux capture-pane -p -J -S - -t "$target" 2>/dev/null | M="$marker" awk '
     { gsub(/^[[:space:]]+|[[:space:]]+$/, "") }
     $0 == ENVIRON["M"] { d++ }
     $0 == "[pi exited] press enter" { e++ }
@@ -31,16 +45,16 @@ count() {
 }
 
 # The visible screen only (no scrollback): what the session shows right now.
-screen() { tmux capture-pane -p -J -t ":$win" 2>/dev/null; }
+screen() { tmux capture-pane -p -J -t "$target" 2>/dev/null; }
 # Milliseconds since the epoch (bash 5 EPOCHREALTIME), so short idle limits are exact.
 now_ms() { local t=${EPOCHREALTIME/./}; echo "${t:0:-3}"; }
 
 deadline=$((SECONDS + timeout))
-tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win" || { echo "GONE"; exit 2; }
+exists || { echo "GONE"; exit 2; }
 read -r base_done base_exit base_limit _ < <(count)
 last_screen=$(screen | md5sum) last_change=$(now_ms)
 while :; do
-  tmux list-windows -F '#W' 2>/dev/null | grep -qxF -- "$win" || { echo "GONE"; exit 2; }
+  exists || { echo "GONE"; exit 2; }
   read -r now_done now_exit now_limit limit_line < <(count)
   # DONE beats LIMITED beats EXITED beats BLOCKED and IDLE: a finished session is done whatever follows.
   [ "$now_done" -gt "$base_done" ] && { echo DONE; exit 0; }

@@ -11,6 +11,7 @@ CODEX = "Error: Codex error: The usage limit has been reached"
 
 
 class PiWaitTest(unittest.TestCase):
+    mode = []
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -21,10 +22,15 @@ class PiWaitTest(unittest.TestCase):
         self.pane.write_text("")
         tmux = bin_dir / "tmux"
         tmux.write_text(f'''#!/usr/bin/env python3
-import sys
-if sys.argv[1] == "list-windows":
+import sys, os
+if sys.argv[1] == "list-panes":
+    if not os.path.exists({str(root / 'gone')!r}):
+        print("%12 build" if "@build" in sys.argv[-1] else "%12")
+elif sys.argv[1] == "list-windows":
     print("build")
 elif sys.argv[1] == "capture-pane":
+    expected = "%12" if os.environ.get("PANE_MODE") else ":build"
+    if sys.argv[sys.argv.index("-t") + 1] != expected: sys.exit(2)
     sys.stdout.write(open({str(self.pane)!r}).read())
 ''')
         tmux.chmod(0o755)
@@ -33,7 +39,7 @@ elif sys.argv[1] == "capture-pane":
 
     def wait(self, *lines, before=()):
         self.write(*before)
-        proc = subprocess.Popen(["bash", str(SCRIPT), "build", "BUILD DONE", "10"], env=self.env,
+        proc = subprocess.Popen(["bash", str(SCRIPT), *self.mode, "build", "BUILD DONE", "10"], env=self.env,
                                 stdout=subprocess.PIPE, text=True)
         time.sleep(0.4)  # let pi-wait take its baseline before the session prints
         self.write(*lines)
@@ -90,7 +96,7 @@ elif sys.argv[1] == "capture-pane":
     def test_a_changing_screen_is_not_idle(self):
         self.env["PI_WAIT_IDLE"] = "1"
         self.write("start")
-        proc = subprocess.Popen(["bash", str(SCRIPT), "build", "BUILD DONE", "10"], env=self.env,
+        proc = subprocess.Popen(["bash", str(SCRIPT), *self.mode, "build", "BUILD DONE", "10"], env=self.env,
                                 stdout=subprocess.PIPE, text=True)
         for i in range(12):  # keep printing for about 1.2 s, longer than the idle limit
             time.sleep(0.1)
@@ -102,6 +108,35 @@ elif sys.argv[1] == "capture-pane":
     def test_done_beats_idle(self):
         self.env["PI_WAIT_IDLE"] = "1"
         self.assertEqual(self.wait("BUILD DONE"), (0, ["DONE"]))
+
+
+class PiPaneWaitTest(PiWaitTest):
+    mode = ["--pane"]
+
+    def setUp(self):
+        super().setUp()
+        self.env["PANE_MODE"] = "1"
+
+    def test_pane_disappearing_during_wait_is_gone(self):
+        proc = subprocess.Popen(["bash", str(SCRIPT), "--pane", "build", "BUILD DONE", "10"],
+                                env=self.env, text=True, stdout=subprocess.PIPE)
+        time.sleep(.4)
+        (self.pane.parent / "gone").touch()
+        out, _ = proc.communicate(timeout=5)
+        self.assertEqual((proc.returncode, out.strip()), (2, "GONE"))
+
+    def test_ambiguous_tag_is_not_captured(self):
+        tmux = self.pane.parent / "bin" / "tmux"
+        tmux.write_text('#!/bin/sh\nprintf "%s\\n" "%12 build" "%13 build"\n')
+        result = subprocess.run(["bash", str(SCRIPT), "--pane", "build", "BUILD DONE", "1"],
+                                env=self.env, text=True, capture_output=True)
+        self.assertEqual((result.returncode, result.stdout.strip()), (2, "GONE"))
+
+    def test_gone_pane_does_not_wait_on_coordinator_window(self):
+        (self.pane.parent / "gone").touch()
+        result = subprocess.run(["bash", str(SCRIPT), "--pane", "build", "BUILD DONE", "1"],
+                                env=self.env, text=True, capture_output=True)
+        self.assertEqual((result.returncode, result.stdout.strip()), (2, "GONE"))
 
 
 if __name__ == "__main__":

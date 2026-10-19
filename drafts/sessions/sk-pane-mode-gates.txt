@@ -1,0 +1,14 @@
+46 skills, always-on ~1290/2500 tokens, 0 errors
+..................................................
+----------------------------------------------------------------------
+Ran 50 tests in 24.228s
+
+OK
+launched pi in pane 'build-one' (%1) (/home/rpmessner/dev/utils/sk-pane-mode/skills/dispatch/scripts/pane-check-4t54mov8)
+build-one: found %1, wait DONE
+launched pi in pane 'build-two' (%2) (/home/rpmessner/dev/utils/sk-pane-mode/skills/dispatch/scripts/pane-check-4t54mov8)
+build-two: found %2, wait DONE
+duplicate build-one refused
+build-one killed: GONE; build-two and coordinator intact; one window
+scratch acceptance PASS
+tickets valid

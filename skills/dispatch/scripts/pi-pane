@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Resolve one @build name in the current tmux session to its stable pane ID.
+# Titles are for humans; only the pane-local tag is identity. Never use an index.
+set -euo pipefail
+[ $# -eq 1 ] && [ -n "$1" ] || { echo 'usage: pi-pane <name>' >&2; exit 1; }
+tmux list-panes -s -F '#{pane_id} #{@build}' | awk -v name="$1" '
+  $2 == name { id=$1; n++ }
+  END { if (n == 1) print id; else exit 2 }'
