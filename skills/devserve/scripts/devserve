@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Worktree previews; Python stdlib, systemd user services and PostgreSQL tools."""
+"""Worktree previews; Python stdlib, systemd or tmux, and PostgreSQL tools."""
 import argparse
 import base64
 import fcntl
@@ -19,6 +19,29 @@ import tomllib
 from pathlib import Path
 from urllib.parse import quote
 
+import devserve_tmux
+import devserve_data
+
+
+def core_api():
+    # Also supports importlib loaders used by the lifecycle renderer and tests.
+    import types
+    return types.SimpleNamespace(run=run, sql=sql, names=names, step=step, worker=worker,
+                                 drop_database=drop_database, __file__=__file__)
+
+
+def tmux_backend():
+    return devserve_tmux.Backend(core_api())
+
+
+def select_backend(platform=None):
+    backend = os.environ.get('DEVSERVE_BACKEND')
+    if backend is None:
+        backend = {'linux': 'systemd', 'darwin': 'tmux'}.get(platform or sys.platform)
+    if backend not in ('systemd', 'tmux'):
+        raise ValueError('unsupported platform/backend; set DEVSERVE_BACKEND=systemd or tmux')
+    return backend
+
 
 def load_config(path):
     with open(path, 'rb') as handle:
@@ -28,7 +51,7 @@ def load_config(path):
     apps = config['apps']
     seen = set()
     allowed = {'name', 'path', 'ports', 'start', 'env_file', 'env', 'data',
-               'source_database', 'migrate', 'seed', 'main_units'}
+               'source_database', 'template_database', 'migrate', 'seed', 'main_units'}
     for app in apps:
         if not isinstance(app, dict) or set(app) - allowed:
             raise ValueError('unknown app fields')
@@ -48,10 +71,16 @@ def load_config(path):
         if (not isinstance(ports, list) or len(ports) != 2 or
                 any(type(p) is not int for p in ports) or not 1024 <= ports[0] <= ports[1] <= 65535):
             raise ValueError(f'{name}: ports must be [first, last], 1024..65535')
-        if app.get('data') not in ('copy', 'fresh'):
-            raise ValueError(f'{name}: data must be copy or fresh')
+        if app.get('data') not in ('copy', 'fresh', 'template'):
+            raise ValueError(f'{name}: data must be copy, fresh or template')
+        if app['data'] == 'template':
+            base = app.get('template_database', '')
+            if not isinstance(base, str) or not re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]{0,57}', base):
+                raise ValueError(f'{name}: template_database must be a database name up to 58 characters')
+            if app.get('source_database') in (base, base + '_next', base + '_prev'):
+                raise ValueError(f'{name}: source must differ from template and its staging names')
         source = app.get('source_database', '')
-        if app['data'] == 'copy' and (not isinstance(source, str) or not re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]{0,62}', source)):
+        if (app['data'] == 'copy' or (app['data'] == 'template' and 'source_database' in app)) and (not isinstance(source, str) or not re.fullmatch(r'[a-zA-Z_][a-zA-Z0-9_]{0,62}', source)):
             raise ValueError(f'{name}: source_database must be a database name, not a URL')
         for key in ('start', 'migrate') + (('seed',) if app['data'] == 'fresh' else ()):
             value = app.get(key)
@@ -149,7 +178,7 @@ def properties(unit):
     return dict(line.split('=', 1) for line in output.splitlines() if '=' in line)
 
 
-def registry():
+def systemd_registry():
     output = run(['systemctl', '--user', 'list-units', '--all', '--plain', '--no-legend', 'devserve-*.service'])
     rows = []
     for line in output.splitlines():
@@ -169,6 +198,14 @@ def registry():
         rows.append(dict(meta, state=state, missing=not Path(meta['worktree']).is_dir(),
                          pid=int(props.get('MainPID', '0'))))
     return rows
+
+
+def registry():
+    rows = systemd_registry() if sys.platform == 'linux' else []
+    tmux_rows = tmux_backend().rows()
+    if {r['unit'] for r in rows} & {r['unit'] for r in tmux_rows}:
+        raise ValueError('preview registered in both backends; resolve duplicate identity before mutation')
+    return rows + tmux_rows
 
 
 def notify(state):
@@ -221,7 +258,10 @@ def prepare(meta):
     exists = database_status(meta)
     database = meta['database']
     if not exists:
-        sql(f'CREATE DATABASE "{database}";')
+        if meta['config']['data'] == 'template':
+            devserve_data.clone(core_api(), database, meta['config']['template_database'])
+        else:
+            sql(f'CREATE DATABASE "{database}";')
         sql(f"COMMENT ON DATABASE \"{database}\" IS '{ownership(meta)}';")
     try:
         app = meta['config']
@@ -263,7 +303,7 @@ class StartupCancelled(Exception):
     pass
 
 
-def worker(meta):
+def worker(meta, publish=notify, tmux=False):
     state = meta.get('state', 'absent')
     child = None
     created = False
@@ -275,6 +315,9 @@ def worker(meta):
         events.append('down')
 
     signal.signal(signal.SIGTERM, stop_requested)
+    if tmux:
+        signal.signal(signal.SIGHUP, stop_requested)
+        signal.signal(signal.SIGINT, stop_requested)
 
     def transition(event):
         nonlocal state, child, created
@@ -293,7 +336,7 @@ def worker(meta):
                     if created:
                         drop_database(meta)
         finally:
-            notify(state)
+            publish(state)
 
     try:
         transition('up')
@@ -369,17 +412,24 @@ def up(apps, worktree):
     if not effects:
         print(existing['url'])
         return
+    backend = existing.get('backend', 'systemd') if existing else select_backend()
     if existing:
-        run(['systemctl', '--user', 'stop', unit])
+        if backend == 'tmux':
+            tmux_backend().down(existing, False, quiet=True)
+        else:
+            run(['systemctl', '--user', 'stop', unit])
     port = choose_port(app['ports'], {row['port'] for row in rows if row['unit'] != unit})
     meta = dict(app=app['name'], unit=unit, worktree=str(worktree), database=database,
                 branch=run(['git', '-C', str(worktree), 'rev-parse', '--abbrev-ref', 'HEAD']),
                 owner=os.environ.get('FOREMAN_SESSION') or getpass.getuser(), port=port,
                 url=f'http://127.0.0.1:{port}', config=app, state=initial)
-    run(service_command(meta) + ['--unit=' + unit, '--description=' + unit,
-        '--remain-after-exit', '--service-type=exec', '--property=NotifyAccess=all',
-        '--property=TimeoutStopSec=15', '--working-directory=' + str(worktree),
-        sys.executable, str(Path(__file__).resolve()), '_worker'])
+    if backend == 'tmux':
+        tmux_backend().launch(meta)
+    else:
+        run(service_command(meta) + ['--unit=' + unit, '--description=' + unit,
+            '--remain-after-exit', '--service-type=exec', '--property=NotifyAccess=all',
+            '--property=TimeoutStopSec=15', '--working-directory=' + str(worktree),
+            sys.executable, str(Path(__file__).resolve()), '_worker'])
     try:
         row = wait_state(unit, {'running', 'failed', 'stopped'})
     except (KeyboardInterrupt, ValueError):
@@ -388,7 +438,10 @@ def up(apps, worktree):
             down(current, False)
         raise
     if row['state'] != 'running':
-        wait_worker_exit(unit)
+        if backend == 'tmux':
+            tmux_backend().wait_exit(unit)
+        else:
+            wait_worker_exit(unit)
         raise ValueError(f'preview failed: {unit}; use logs, then down --drop-db')
     print(meta['url'])
 
@@ -402,6 +455,8 @@ def wait_worker_exit(unit):
 
 
 def down(row, drop):
+    if row.get('backend') == 'tmux':
+        return tmux_backend().down(row, drop)
     if row['pid']:
         run(['systemctl', '--user', 'kill', '--kill-whom=main', '--signal=SIGTERM', row['unit']])
         row = wait_state(row['unit'], {'stopped', 'failed'}, timeout=30)
@@ -424,7 +479,34 @@ def down(row, drop):
     print(row['unit'] + (' removed' if drop else ' stopped (database kept)'))
 
 
+def data_command(app, operation, **fields):
+    meta = dict(config=app, port=0, operation=operation, backend=select_backend(), **fields)
+    if meta['backend'] == 'systemd':
+        run(service_command(meta) + ['--wait', '--pipe', '--collect',
+            sys.executable, str(Path(__file__).resolve()), '_data'])
+    else:
+        run([sys.executable, str(Path(__file__).resolve()), '_data'],
+            env=dict(os.environ, DEVSERVE_META=encode(meta)))
+
+
 def main():
+    if sys.argv[1:] == ['_data']:
+        meta = decode(os.environ['DEVSERVE_META'])
+        if meta['backend'] == 'tmux' and meta['config'].get('env_file'):
+            os.environ.update(devserve_tmux.read_env(meta['config']['env_file']))
+        if meta['operation'] == 'base':
+            devserve_data.refresh(core_api(), meta['config'], meta['dump'])
+        else:
+            devserve_data.gc(core_api(), meta['config'], meta['known'], meta['hashes'],
+                             meta['stopped'], meta['protected'])
+        return 0
+    if len(sys.argv) == 5 and sys.argv[1] == '_tmux_worker':
+        os.environ['DEVSERVE_STATE_DIR'] = sys.argv[2]
+        os.environ['DEVSERVE_TMUX_SOCKET'] = sys.argv[4]
+        return tmux_backend().worker(sys.argv[3])
+    if len(sys.argv) == 4 and sys.argv[1] == '_tmux_drop':
+        os.environ['DEVSERVE_STATE_DIR'] = sys.argv[2]
+        return tmux_backend().worker(sys.argv[3], drop=True)
     if len(sys.argv) == 2 and sys.argv[1] in ('_worker', '_drop', '_stopped'):
         meta = decode(os.environ['DEVSERVE_META'])
         if sys.argv[1] == '_stopped':
@@ -446,11 +528,20 @@ def main():
     stop = commands.add_parser('down')
     stop.add_argument('preview')
     stop.add_argument('--drop-db', action='store_true')
-    commands.add_parser('gc')
+    commands.add_parser('gc').add_argument('--stopped', action='store_true')
+    base = commands.add_parser('base').add_subparsers(dest='action', required=True).add_parser('refresh')
+    base.add_argument('app')
+    base.add_argument('--dump', action='store_true')
     args = parser.parse_args()
+    select_backend()  # Reject invalid overrides even for read-only commands.
     config = Path(os.environ.get('DEVSERVE_CONFIG_DIR', str(Path.home() / '.config/devserve'))) / 'apps.toml'
     apps = load_config(config)
     if args.command == 'logs':
+        row = next((r for r in registry() if r['unit'].removesuffix('.service') == args.target.removesuffix('.service')), None)
+        if row and row.get('backend') == 'tmux':
+            return tmux_backend().logs(row, args.follow)
+        if sys.platform != 'linux':
+            raise ValueError('installed systemd app logs are available only on Linux')
         targets = [r['unit'] for r in registry() if r['unit'].removesuffix('.service') == args.target.removesuffix('.service')]
         targets += [u for app in apps if app['name'] == args.target for u in app['main_units']]
         if not targets:
@@ -462,9 +553,9 @@ def main():
             argv += ['-f']
         os.execvp(argv[0], argv)
     if args.command == 'ls':
-        previews = [{k: v for k, v in row.items() if k not in ('config', 'pid')} for row in registry()]
+        previews = [{k: v for k, v in row.items() if k not in ('config', 'pid', 'window', 'server', 'token', 'socket', 'previous')} for row in registry()]
         mains = [dict(app=app['name'], unit=unit, state=properties(unit).get('ActiveState', 'unknown'))
-                 for app in apps for unit in app['main_units']]
+                 for app in apps for unit in app['main_units'] if sys.platform == 'linux']
         if args.json:
             print(json.dumps(dict(previews=previews, main_units=mains), sort_keys=True))
         else:
@@ -474,17 +565,42 @@ def main():
             for row in mains:
                 print(f'{row["unit"]} app={row["app"]} main state={row["state"]}')
         return 0
-    runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/run/user/{os.getuid()}'))
+    if sys.platform == 'linux':
+        runtime = Path(os.environ.get('XDG_RUNTIME_DIR', f'/run/user/{os.getuid()}'))
+    else:
+        tmux_backend().ensure()
+        runtime = devserve_tmux.state_dir()
     with open(runtime / 'devserve.lock', 'a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        if args.command == 'up':
+        if args.command == 'base':
+            app = next((app for app in apps if app['name'] == args.app), None)
+            if app is None:
+                raise ValueError('unknown app')
+            data_command(app, 'base', dump=args.dump)
+            print(app['template_database'] + ' refreshed')
+        elif args.command == 'up':
             up(apps, args.worktree)
         else:
             rows = registry()
             if args.command == 'gc':
+                protected = {app[key] for app in apps for key in ('source_database', 'template_database')
+                             if isinstance(app.get(key), str)}
+                protected |= {app['template_database'] + suffix for app in apps
+                              if app['data'] == 'template' for suffix in ('_next', '_prev')}
                 for row in rows:
-                    if row['missing']:
+                    if row['database'] in protected:
+                        continue
+                    if row['missing'] or (args.stopped and row['state'] in ('stopped', 'failed')):
                         down(row, True)
+                known = [row['unit'] for row in registry()]
+                try:
+                    known += [window[0] + '.service' for window in tmux_backend().windows().values()]
+                except FileNotFoundError:
+                    pass  # Linux/systemd does not require tmux to be installed.
+                for app in apps:
+                    data_command(app, 'gc', known=known,
+                                 hashes=devserve_data.worktree_hashes(core_api(), app), stopped=args.stopped,
+                                 protected=sorted(protected))
             else:
                 row = next((r for r in rows if r['unit'].removesuffix('.service') == args.preview.removesuffix('.service')), None)
                 if not row:
